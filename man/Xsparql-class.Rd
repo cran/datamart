@@ -9,7 +9,4 @@
 \details{
   See \code{Dbpedia} for examples.
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

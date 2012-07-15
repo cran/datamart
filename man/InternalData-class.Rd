@@ -5,7 +5,4 @@
   This class allows to query datasets that can be loaded
   with data(). Only read-only access.
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

@@ -1,0 +1,19 @@
+\name{strhead}
+\alias{strhead}
+\title{Get the first n letters}
+\usage{
+  strhead(s, n = 1)
+}
+\arguments{
+  \item{s}{character or character vector}
+
+  \item{n}{numeric, default 1}
+}
+\value{
+  character
+}
+\description{
+  if n>0, return the first n letters of x if n<0, return
+  all but the last abs(n) letters of x
+}
+

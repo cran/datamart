@@ -22,7 +22,4 @@
   dispatching on the signature, which is the main reason
   for the function.
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

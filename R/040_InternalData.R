@@ -6,7 +6,6 @@
 #' @name InternalData-class
 #' @rdname InternalData-class
 #' @exportClass InternalData
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 setClass(
   Class="InternalData", 
   representation=representation(name="character", package="character", data_env="environment"), 
@@ -21,28 +20,24 @@ setClass(
 #' @param clss  name of the class to create. Default InternalData, must be inherited from this class.
 #'
 #' @export
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 internalData <- function(name, package=NULL, clss="InternalData") {
     e <- new.env()
     do.call("data", list(name=name, package=package, envir=e))
     new(clss, name=name, package=package, data_env=e)
 }
 
-# todo: don't allow 'scrape' method 
-
-#' Get the Raw data.
+#' For the InternalData class, one resource with the same name as the dataset is defined.
 #'
-#' @param self     a InternalData object
-#' @param resource an object of class Raw, usually created by query.xdata
-#' @param ...      additional arguments, ignored.
-#'
-#' @docType methods
 #' @rdname query-methods
-#' @aliases query,InternalData,Raw-method
-#' @export
+#' @aliases query,InternalData,character,missing-method
 setMethod(
   f="query",
-  signature=c(self="InternalData", resource=resource("Raw")),
-  definition=function(self, resource, ...) self@data_env[[self@name]]
+  signature=c(self="InternalData", resource="character", dbconn="missing"),
+  definition=function(self, resource, ...) {
+    if(resource==self@name)
+      self@data_env[[self@name]]
+    else
+      callNextMethod()
+  }
 )
 

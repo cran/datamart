@@ -1,19 +1,16 @@
-#' Example for InternalData: German Expenditure Survey
-#' 
-#' Shows how to use xdata with local datasets.
-#' Only read-only access.
+#' German Income and Expenditure Survey 2008 on private spendings, differentiated by household type and household income.
 #'
+#' @name Evs-class
+#' @rdname Evs-class
+#' @aliases evs2008.lvl2
+#' @exportClass Evs
+#' @references 
+#' Statistisches Bundesamt: Wirtschaftsrechnungen. Einkommens- und Verbrauchsstichprobe. Einnahmen und Ausgaben privater Haushalte. Fachserie 15 Heft 4.
 #' @examples
 #' xp <- expenditures()
 #' queries(xp)
 #' query(xp, "Categories")
 #' query(xp, "Elasticity", categ="05")
-#' 
-#' 
-#' @name Evs-class
-#' @rdname Evs-class
-#' @exportClass Evs
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 setClass(
   Class="Evs", 
   contains="InternalData"
@@ -27,34 +24,23 @@ setClass(
 #' contact the Federal Statistical Office.
 #'
 #' @return an object of class "Evs"
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 #' @export
 expenditures <- function() internalData(name="evs2008.lvl2", package="datamart", clss="Evs")
 
 
-#' Example Query for German Expenditure dataset: Categories
+#' For the Evs class, the query for the Categories resource (typical expenses by Coicop2 categories)
+#' provides additional optional parameters:
+#' income (income level, default "(all)"), hhtype (household type, default "(all)"),
+#' relative (if TRUE (default), return percentages, otherwise Euro).
 #'
-#' Returns typical expenses by Coicop2 categories. 
-#' Specification of income group and household type is possible.
-#' Return value either in percent (relative=TRUE, default) or in Euro.
-#'
-#' @param self       data object
-#' @param resource   \code{Categories} object identifying the resource requested
-#' @param income     income level, default "(all)"
-#' @param hhtype     household type, default "(all)"
-#' @param relative   if TRUE (default), return percentages, otherwise Euro
-#' @param ...        other parameters, ignored
-#'
-#' @return vector
-#' @docType methods
 #' @rdname query-methods
-#' @aliases query,Evs,Categories-method
+#' @aliases query,Evs,Categories,missing-method
 setMethod(
   f="query",
-  signature=c(self="Evs", resource=resource("Categories")),
+  signature=c(self="Evs", resource=resource("Categories"), dbconn="missing"),
   definition=function(self, resource, income="(all)", hhtype="(all)", relative=TRUE, ...) {
     
-    dat <- subset(query(self, "Raw"), coicop2 != "15" & coicop2 != "00")
+    dat <- subset(query(self, "evs2008.lvl2"), coicop2 != "15" & coicop2 != "00")
     income_lvls <- unique(dat$income)
     if(!income %in% income_lvls) stop("invalid 'income' argument, expected one of '", paste(income_lvls, collapse="', '"), "'.")
     hhtype_lvls <- unique(dat$hhtype)
@@ -68,25 +54,18 @@ setMethod(
 )
 
 
-#' Example Query for German Expenditure dataset: Elasticity
+#' For the Evs class, the query for the Elasticity resource (Plots expenditures by income group for a given category),
+#' an additional parameters categ (character, category for which to plot income elasticity), xlab and ylab (axis titles)
+#' are supported. Other parameters will be passed to boxplot.
 #'
-#' Plots expenditures by income group for a given category.
-#'
-#' @param self       data object
-#' @param resource   \code{Elasticity} object identifying the resource requested
-#' @param categ      category for which to plot income elasticity.
-#' @param ...        other parameters, passed to beeswarm
-#'
-#' @return vector
-#' @docType methods
 #' @rdname query-methods
-#' @aliases query,Evs,Elasticity-method
+#' @aliases query,Evs,Elasticity,missing-method
 setMethod(
   f="query",
-  signature=c(self="Evs", resource=resource("Elasticity")),
+  signature=c(self="Evs", resource=resource("Elasticity"), dbconn="missing"),
   definition=function(self, resource, categ="", xlab="", ylab="", main=NULL, ...) {
     #if(!require(beeswarm)) stop("could not load required package 'beeswarm'")
-    dat <- subset(query(self, "Raw"), coicop2 != "15" & coicop2 != "00" & income != "(all)")
+    dat <- subset(query(self, "evs2008.lvl2"), coicop2 != "15" & coicop2 != "00" & income != "(all)")
     cat_lvls <- unique(dat$coicop2)
     if (!categ %in% cat_lvls) stop("invalid 'categ' argument, expected one of '", paste(cat_lvls, collapse="', '"), "'.")
     
@@ -103,21 +82,11 @@ setMethod(
   }
 )
 
-#' Example Query for German Expenditure dataset: Trellis Plot of Elasticities
-#'
-#' Plots expenditures by income group for two categories.
-#'
-#' @param self       data object
-#' @param resource   \code{Elasticities} object identifying the resource requested
-#' @param ...        other parameters, passed to beeswarm
-#'
-#' @return vector
-#' @docType methods
 #' @rdname query-methods
-#' @aliases query,Evs,Elasticities-method
+#' @aliases query,Evs,Elasticities,missing-method
 setMethod(
   f="query",
-  signature=c(self="Evs", resource=resource("Elasticities")),
+  signature=c(self="Evs", resource=resource("Elasticities"), dbconn="missing"),
   definition=function(self, resource, categ="", xlab="", ylab="", ...) {
     par(mfrow=c(2,1))
     # query(self, "Elasticity", categ="01/02", ...)

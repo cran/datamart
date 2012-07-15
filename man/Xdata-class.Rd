@@ -1,6 +1,6 @@
 \name{Xdata-class}
 \alias{Xdata-class}
-\title{A class representing a data source}
+\title{Xdata -- A class representing a data source}
 \description{
   Most methods of the class are abstract, however the
   \code{show}, \code{print}, \code{queries} methods will
@@ -13,8 +13,5 @@
   Derived methods that are also interpreting resource as
   character should first call this method via
   \code{callNextMethod}.
-}
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
 }
 

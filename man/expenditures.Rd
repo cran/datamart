@@ -16,7 +16,4 @@
   If you want more and/or more accurate data, contact the
   Federal Statistical Office.
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

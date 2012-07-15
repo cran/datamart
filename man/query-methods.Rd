@@ -1,14 +1,19 @@
 \docType{methods}
 \name{query}
 \alias{query}
-\alias{query,Dbpedia,Nuts1-method}
-\alias{query,Evs,Categories-method}
-\alias{query,Evs,Elasticities-method}
-\alias{query,Evs,Elasticity-method}
-\alias{query,InternalData,Raw-method}
-\alias{query,Twttr,User_timeline-method}
-\alias{query,Xdata,character-method}
-\alias{query,Xsparql,character-method}
+\alias{query,Dbpedia,Nuts1,missing-method}
+\alias{query,Evs,Categories,missing-method}
+\alias{query,Evs,Elasticities,missing-method}
+\alias{query,Evs,Elasticity,missing-method}
+\alias{query,GScholar,character,missing-method}
+\alias{query,InternalData,character,missing-method}
+\alias{query,Mashup,character,missing-method}
+\alias{query,Mashup,character,SQLiteDataStore-method}
+\alias{query,Twttr,User_timeline,missing-method}
+\alias{query,UrlData,character,missing-method}
+\alias{query,Xdata,character,missing-method}
+\alias{query,Xdata,character,SQLiteDataStore-method}
+\alias{query,Xsparql,character,missing-method}
 \title{Request data from data source}
 \arguments{
   \item{self}{an Xdata object}
@@ -17,126 +22,67 @@
   End-user usually provide character, developer use
   \code{resource} and dispatch on the type.}
 
+  \item{dbconn}{an optional SQLiteDataStoreConnection. See
+  details}
+
   \item{...}{additional parameter}
-
-  \item{self}{a Twttr object}
-
-  \item{resource}{an object of class User_timeline, usually
-  created by query.xdata}
-
-  \item{user}{twitter screenname, default self@user}
-
-  \item{since_id}{character, only tweets with newer id,
-  default NULL}
-
-  \item{count}{numerical, maximum tweets, default NULL}
-
-  \item{verbose}{logical, diagnostic messages? Default is
-  getOption("verbose")}
-
-  \item{self}{xsparql object}
-
-  \item{resource}{SPARQL statement}
-
-  \item{opts}{optional parameters as a list, see details}
-
-  \item{maxrows}{optional (numeric, default=NULL) for limit
-  the rows to fetch}
-
-  \item{interactive}{optional (logical, default FALSE) asks
-  for user input before fetching next rows}
-
-  \item{typeconv}{optional (logical, default TRUE) to
-  convert numbers and dates to R types}
-
-  \item{self}{data object}
-
-  \item{resource}{character describing the resource
-  requested}
-
-  \item{verbose}{if TRUE, diagnostic messages (default
-  getOption("verbose"))}
-
-  \item{self}{a InternalData object}
-
-  \item{resource}{an object of class Raw, usually created
-  by query.xdata}
-
-  \item{...}{additional arguments, ignored.}
-
-  \item{self}{data object}
-
-  \item{resource}{\code{Categories} object identifying the
-  resource requested}
-
-  \item{income}{income level, default "(all)"}
-
-  \item{hhtype}{household type, default "(all)"}
-
-  \item{relative}{if TRUE (default), return percentages,
-  otherwise Euro}
-
-  \item{...}{other parameters, ignored}
-
-  \item{self}{data object}
-
-  \item{resource}{\code{Elasticity} object identifying the
-  resource requested}
-
-  \item{categ}{category for which to plot income
-  elasticity.}
-
-  \item{...}{other parameters, passed to beeswarm}
-
-  \item{self}{data object}
-
-  \item{resource}{\code{Elasticities} object identifying
-  the resource requested}
-
-  \item{...}{other parameters, passed to beeswarm}
-}
-\value{
-  a data.frame object
-
-  a data.frame object
-
-  vector
-
-  vector
-
-  vector
 }
 \description{
   This generic function is the main interface to the data
-  behind the xdata layer. The first argument is the data
-  object, the second argument is an identifier of the
-  resource requested. For the end-user this is usually a
-  character, but when building derived classes use
-  resource("your_id") as signature.
+  behind the Xdata layer. The first argument is the data
+  object, the second argument is an identifier, usually a
+  string, of the resource requested.
 
-  Query user timeline
+  For the Twttr class, the query method provides additional
+  optional arguments: user (twitter screenname, default
+  self@user), since_id (character, only tweets with newer
+  id, default NULL), count (numerical, maximum tweets,
+  default NULL)
 
-  Query method for SPARQL end points
+  For the Xsparql class the query method relies on code of
+  the authors of the SPARQL package. The resource parameter
+  is interpreted als SPARQL statement, optional parameters
+  are: maxrows (numeric, default=NULL) for limit the rows
+  to fetch, interactive (logical, default FALSE) asks for
+  user input before fetching next rows, typeconv (logical,
+  default TRUE) to convert numbers and dates to R types
 
-  Internal function, use query(dbpedia(), "Nuts1", ...)
-  instead.
+  For the InternalData class, one resource with the same
+  name as the dataset is defined.
 
-  Get the Raw data.
+  For the Evs class, the query for the Categories resource
+  (typical expenses by Coicop2 categories) provides
+  additional optional parameters: income (income level,
+  default "(all)"), hhtype (household type, default
+  "(all)"), relative (if TRUE (default), return
+  percentages, otherwise Euro).
 
-  Returns typical expenses by Coicop2 categories.
-  Specification of income group and household type is
-  possible. Return value either in percent (relative=TRUE,
-  default) or in Euro.
+  For the Evs class, the query for the Elasticity resource
+  (Plots expenditures by income group for a given
+  category), an additional parameters categ (character,
+  category for which to plot income elasticity), xlab and
+  ylab (axis titles) are supported. Other parameters will
+  be passed to boxplot.
 
-  Plots expenditures by income group for a given category.
-
-  Plots expenditures by income group for two categories.
+  For the GScholar class additional required parameters are
+  "from" and "to", integers (years) that specify the search
+  time span.
 }
 \details{
+  A optional third parameter is dbconn, a SqliteDataStore
+  object. If provided, it tries to locate the resource in
+  the database first and thus complements the \code{scrape}
+  method.
+
   Depending on the data object, additional parameter can be
   provided.
-}
-\author{
-  see SPARQL package
+
+  Inherited classes should override the slot with
+  dbconn="missing". The slot resource should be filled with
+  the help of the \code{resource} function. The default
+  (Xdata) implementation with resource as character creates
+  a Resource object of that name and calls itself again
+  with this parameter. Thus dispatching on the resource is
+  possible.
 }
 

@@ -13,7 +13,6 @@
 #' @name Dbpedia-class
 #' @rdname Dbpedia-class
 #' @exportClass Dbpedia
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 setClass(Class="Dbpedia", representation=representation(), contains="Xsparql")
 
 
@@ -21,11 +20,10 @@ setClass(Class="Dbpedia", representation=representation(), contains="Xsparql")
 #'
 #' @return a Dbpedia object, inherited from Xsparql
 #' @export
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 dbpedia <- function() {
     res <- new("Dbpedia",
         url="http://dbpedia.org/sparql", 
-        ns=c("dbo", "<http://dbpedia.org/ontology/>",
+        nspace=c("dbo", "<http://dbpedia.org/ontology/>",
              "rdf", "<http://xmlns.com/foaf/0.1>",
              "rdfs", "<http://www.w3.org/2000/01/rdf-schema#>",
              "owl", "<http://www.w3.org/2002/07/owl#>",
@@ -41,21 +39,11 @@ dbpedia <- function() {
     return(res)
 }
 
-#' Query method for dbpedia data object 
-#'
-#' Internal function, use query(dbpedia(), "Nuts1", ...) instead.
-#'
-#' @param self       data object
-#' @param resource   character describing the resource requested
-#' @param verbose    if TRUE, diagnostic messages (default getOption("verbose"))
-#'
-#' @return a data.frame object
-#' @docType methods
 #' @rdname query-methods
-#' @aliases query,Dbpedia,Nuts1-method
+#' @aliases query,Dbpedia,Nuts1,missing-method
 setMethod(
   f="query",
-  signature=c(self="Dbpedia", resource=resource("Nuts1")),
+  signature=c(self="Dbpedia", resource=resource("Nuts1"), dbconn="missing"),
   definition=function(self, resource, verbose=getOption("verbose"), ...) {
     if(verbose) cat("query Dbpedia#Nuts1\n")
     stmt <- paste(

@@ -1,22 +1,19 @@
 \name{xsparql}
 \alias{xsparql}
-\title{data object for sparql}
+\title{Constructor for Xsparql}
 \usage{
-  xsparql(url, ns = "")
+  xsparql(url, nspace = "")
 }
 \arguments{
   \item{url}{sparql end point}
 
-  \item{ns}{character vector with short name / namespace
-  expansions}
+  \item{nspace}{character vector with short name /
+  namespace expansions}
 }
 \value{
   a xsparql object
 }
 \description{
-  data object for sparql
-}
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
+  Constructor for Xsparql
 }
 

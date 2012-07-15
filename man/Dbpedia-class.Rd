@@ -12,7 +12,4 @@
   query(dbp, "Nuts1")
 }
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

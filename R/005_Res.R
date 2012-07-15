@@ -9,7 +9,6 @@
 #' @name Resource-class
 #' @rdname Resource-class
 #' @exportClass Resource
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 setClass(Class="Resource", representation=representation())
 
 #' Generate Resource classes on the fly
@@ -27,7 +26,6 @@ setClass(Class="Resource", representation=representation())
 #' @param verbose  if TRUE, diagnostic messages. Defaults to getOption("verbose").
 #' 
 #' @export
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 resource <- function(id, verbose=getOption("verbose")) {
   cl <- try(getClass(id), silent=TRUE)
   if(inherits(cl, "try-error")) {

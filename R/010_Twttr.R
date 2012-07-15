@@ -2,11 +2,11 @@
 #' 
 #' This class allows to query user timelines.
 #' Other resources have not been implemented yet.
+#' The class is subject to change in further versions.
 #' 
 #' @name Twttr-class
 #' @rdname Twttr-class
 #' @exportClass Twttr
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 #' @examples
 #' \dontrun{
 #'   tw <- twttr(user="wagezudenken")
@@ -22,28 +22,20 @@ setClass(Class="Twttr", representation=representation(user="character"), contain
 #' @param user  character, twitter screenname
 #'
 #' @export
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 twttr <- function(user="") {
   res <- new("Twttr", user=user)
   return(res)
 }
 
-#' Query user timeline
+#' For the Twttr class, the query method provides additional optional arguments:
+#' user (twitter screenname, default self@@user), since_id (character, only tweets with newer id, default NULL),
+#' count (numerical, maximum tweets, default NULL)
 #'
-#' @param self     a Twttr object
-#' @param resource an object of class User_timeline, usually created by query.xdata
-#' @param user     twitter screenname, default self@@user
-#' @param since_id character, only tweets with newer id, default NULL
-#' @param count    numerical, maximum tweets, default NULL
-#' @param verbose  logical, diagnostic messages? Default is getOption("verbose")
-#'
-#' @docType methods
 #' @rdname query-methods
-#' @aliases query,Twttr,User_timeline-method
-#' @export
+#' @aliases query,Twttr,User_timeline,missing-method
 setMethod(
   f="query",
-  signature=c(self="Twttr", resource=resource("User_timeline")),
+  signature=c(self="Twttr", resource=resource("User_timeline"), dbconn="missing"),
   definition=function(self, resource, user=NULL, since_id=NULL, count=NULL, verbose=getOption("verbose")) {
     if(is.null(user))  user <- self@user
     

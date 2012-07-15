@@ -16,7 +16,4 @@
 \description{
   Constructor for InternalData objects
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

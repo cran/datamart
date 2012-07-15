@@ -1,24 +1,24 @@
 % A wrapper for R's data() function
 % Karsten Weinert
-% Jun 12, 2012
+% Jun 19, 2012
 
 The workflow for statistical analyses is discussed 
 [at](http://stackoverflow.com/questions/1429907/workflow-for-statistical-analysis-and-report-writing)
 [several](http://stats.stackexchange.com/questions/2910/how-to-efficiently-manage-a-statistical-analysis-project)
-[places](http://www.vcasmo.com/video/drewconway/10362).
+[places](http://www.vcasmo.com/video/drewconway/10362). Often, it is recommended:
 
-Often, it is recommended:
-- never change the raw data, but transform it,
-- keep your analysis reproducible,
-- separate functions and data,
-- use R package system as organizing structure.
+  - never change the raw data, but transform it,
+  - keep your analysis reproducible,
+  - separate functions and data,
+  - use R package system as organizing structure.
 
 In some recent projects I tried an S4 class approach for this workflow, which
-I want to present and discuss. It makes use of the package `xdata`, which I recently
+I want to present and discuss. It makes use of the package `datamart`, which I recently
 submitted to CRAN. Here is a sample session:
 
 <<templ, echo=TRUE, eval=TRUE>>=
-library(xdata)
+library(datamart)
+library(beeswarm)
 
 # load one of my datasets
 xp <- expenditures()
@@ -28,10 +28,8 @@ xp <- expenditures()
 # dataset did I once define?
 queries(xp)
 
-# get me some resources
+# get me a resource
 head(query(xp, "Raw"))
-query(xp, "Categories", hhtype="Single man", income="lt900", relative=FALSE)
-query(xp, "Elasticities", cex.axis=0.5)
 @
 
 Read on to see how a S4 dataset object is defined and accessed, and what I see in favour and against 
@@ -47,13 +45,14 @@ and `source`ing or using R's work space, here is a different approach.
 
 The proposed workflow uses R's package structure to organize code, data, documentation and additional information.
 This has some advantages:
-- the directory structure stays the same across projects; it is easier to find back after a couple of months,
-- the packaging mechanism, especially the `R CMD check` command guide the archivation process,
-- it is possible but not necessary to make the data including the analysis public,
-- there are tools that support development of packages. Even in base R there is the `package.skeleton` function, and
-  the add-on package `devtools` has a `load_all` function which allows to load a development version of a project's package 
-  without having to detach, build, and attach it. (However, I am still using my own less mature function `devlib` as 
-  part of my `.Rprofile` for this.)
+
+  - the directory structure stays the same across projects; it is easier to find back after a couple of months,
+  - the packaging mechanism, especially the `R CMD check` command guide the archivation process,
+  - it is possible but not necessary to make the data including the analysis public,
+  - there are tools that support development of packages. Even in base R there is the `package.skeleton` function, and
+    the add-on package `devtools` has a `load_all` function which allows to load a development version of a project's package 
+    without having to detach, build, and attach it. (However, I am still using my own less mature function `devlib` as 
+    part of my `.Rprofile` for this.)
 
 As an example I use a CSV file derived from the German Income and Expenditure Survey. This file `evs2008.lvl2.csv` is put in the
 `data` subdirectory. I add a file `evs2008.lvl2.R` that basically calls `read.csv2` with the right parameters.
@@ -61,9 +60,9 @@ As an example I use a CSV file derived from the German Income and Expenditure Su
 ## Declare a S4 class for the dataset
 
 The new step, and the point of this blog post, is that I now define a S4 class `Evs` that is derived from
-`xdata::InternalData`: 
+`datamart::InternalData`: 
 
-<<setclass, echo=TRUE, eval=FALSE>>
+<<setclass, echo=TRUE, eval=FALSE>>=
 setClass(
   Class="Evs", 
   contains="InternalData"
@@ -75,7 +74,7 @@ the data and one method `queries` for introspection (more on that later). The `I
 wrapper for the `data` function. On instantiation, the dataset is loaded in a object's private environment. It can then accessed 
 by querying the `Raw` resource. So the usual call `data(evs2008.lvl2)` now becomes
 
-<<instantiation, echo=TRUE, eval=TRUE>>
+<<instantiation, echo=TRUE, eval=TRUE>>=
 xp <- expenditures()
 evs2008.lvl2 <- query(xp, "Raw")
 @
@@ -90,7 +89,7 @@ define custom queries.
 As S4 class, it is possible to enhance it using inheritance and other object oriented techniques. For instance,
 it is possible to create a parameterized query for expenditure category in certain household types and/or income situations
 
-<<cat_query, echo=TRUE, eval=FALSE>>
+<<cat_query, echo=TRUE, eval=FALSE>>=
 setMethod(
   f="query",
   signature=c(self="Evs", resource=resource("Categories")),
@@ -121,7 +120,7 @@ the `resource` function.
 
 Other queries may produce graphics, for example
 
-<<ela_query, echo=TRUE, eval=FALSE>>
+<<ela_query, echo=TRUE, eval=FALSE>>=
 setMethod(
   f="query",
   signature=c(self="Evs", resource=resource("Elasticity")),
@@ -153,9 +152,9 @@ well as long there are no more than one arguments to dispatch on, and aas long a
 to query it.
 
 The `biomaRt` package of the bioconductor project is somewhat similar, for instance, with its `useMart` function.
-It is restricted to certain bioinformatics databases.
+It is focused on certain bioinformatics databases.
 
-The original inspiration for the `xdata` comes from the `CountryData` function in Mathematica. This and similar `xxxData` functions 
+The original inspiration for the `datamart` comes from the `CountryData` function in Mathematica. This and similar `xxxData` functions 
 in Mathematica provide introspection facilities like `CountryData[], CountryData["Tags"], CountryData["Properties"]` and deliver
 the data in various formats, as numbers, as polygons, etc.
 

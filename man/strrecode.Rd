@@ -1,0 +1,22 @@
+\name{strrecode}
+\alias{strrecode}
+\title{Pattern-based recoding}
+\usage{
+  strrecode(pats, repls, x, ...)
+}
+\arguments{
+  \item{pats}{vector of patterns}
+
+  \item{repls}{vector of replacements}
+
+  \item{x}{character or character vector}
+
+  \item{...}{additional parameter, passed to grepl}
+}
+\value{
+  replaced vector
+}
+\description{
+  Pattern-based recoding
+}
+

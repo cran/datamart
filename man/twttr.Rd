@@ -11,7 +11,4 @@
   Use twttr() to initialize. If no user parameter are
   provided, then the global options pft.user is used.
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

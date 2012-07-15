@@ -9,7 +9,4 @@
   signature is possible, which is the main reason for using
   this class.
 }
-\author{
-  Karsten Weinert \email{k.weinert@gmx.net}
-}
 

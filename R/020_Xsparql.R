@@ -8,27 +8,25 @@
 #' @name Xsparql-class
 #' @rdname Xsparql-class
 #' @exportClass Xsparql
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 setClass(
   Class="Xsparql", 
-  representation=representation(url="character", ns="character"), 
+  representation=representation(url="character", nspace="character"), 
   contains="Xdata",
   validity=function(object) {
-    if((object@ns != "") && length(object@ns) %% 2 != 0)
-      stop("invalid ns parameter, character vector of even length or '' expected.")
+    if((object@nspace != "") && length(object@nspace) %% 2 != 0)
+      stop("invalid nspace parameter, character vector of even length or '' expected.")
   }
 )
 
-#' data object for sparql
+#' Constructor for Xsparql
 #'
 #' @param url       sparql end point
-#' @param ns        character vector with short name / namespace expansions
+#' @param nspace        character vector with short name / namespace expansions
 #'
 #' @return a xsparql object
 #' @export
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
-xsparql <- function(url, ns="") {
-  res <- new("Xsparql", url=url, ns=ns)
+xsparql <- function(url, nspace="") {
+  res <- new("Xsparql", url=url, nspace=nspace)
   return(res)
 }
 
@@ -84,23 +82,17 @@ mySPARQL <- function (url, query, typeconv=TRUE, verbose=getOption("verbose")) {
   return(data.frame(res))
 }
 
-#' Query method for SPARQL end points
+#' For the Xsparql class the query method relies on code of the authors of the SPARQL package.
+#' The resource parameter is interpreted als SPARQL statement, optional parameters are: 
+#' maxrows (numeric, default=NULL) for limit the rows to fetch, 
+#' interactive (logical, default FALSE) asks for user input before fetching next rows,
+#' typeconv (logical, default TRUE) to convert numbers and dates to R types
 #'
-#' @param self       xsparql object
-#' @param resource   SPARQL statement
-#' @param opts       optional parameters as a list, see details
-#' @param maxrows    optional (numeric, default=NULL) for limit the rows to fetch
-#' @param interactive optional (logical, default FALSE) asks for user input before fetching next rows
-#' @param typeconv   optional (logical, default TRUE) to convert numbers and dates to R types
-#'
-#' @return a data.frame object
-#' @docType methods
 #' @rdname query-methods
-#' @aliases query,Xsparql,character-method
-#' @author see SPARQL package
+#' @aliases query,Xsparql,character,missing-method
 setMethod(
   f="query",
-  signature=c(self="Xsparql", resource="character"),
+  signature=c(self="Xsparql", resource="character", dbconn="missing"),
   definition=function(self, resource, maxrows=NULL, interactive=FALSE, typeconv=TRUE, verbose=getOption("verbose")) {
     if(verbose) cat("query Xsparql#res=", resource, "\n")
     r <- try(new(resource), silent=TRUE)
@@ -109,9 +101,9 @@ setMethod(
       return(query(self, r, maxrows=maxrows, interactive=interactive, typeconv=typeconv, verbose=verbose))
     }
     prefix <- c()
-    if(length(self@ns) %% 2 != 0) 
-      for(i in seq(1,length(self@ns)-1,2)) 
-        prefix <- c(prefix, paste("PREFIX ", self@ns[[i]], ": ", self@ns[[i+1]], sep=""))
+    if(length(self@nspace) %% 2 != 0) 
+      for(i in seq(1,length(self@nspace)-1,2)) 
+        prefix <- c(prefix, paste("PREFIX ", self@nspace[[i]], ": ", self@nspace[[i+1]], sep=""))
     prefix <- paste(prefix, collapse="\n")
     query <- paste(prefix, resource, sep="")
     if(is.null(maxrows)) {

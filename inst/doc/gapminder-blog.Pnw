@@ -1,0 +1,158 @@
+% Convenient access to Gapminder's datasets from R
+% Karsten Weinert
+% Jul 15, 2012
+
+In April, [Hans Rosling](http://www.ted.com/talks/hans_rosling_religions_and_babies.html) 
+examined the influence of religion on fertility. I used R to replicate a graphic of his talk:
+
+<<examp, fig=TRUE, echo=TRUE, eval=TRUE>>=
+library(datamart)
+gm <- gapminder()
+#queries(gm)
+
+# babies per woman
+tmp <- query(gm, "TotalFertilityRate")
+babies <- as.vector(tmp["2008"])
+names(babies) <- names(tmp)
+babies <- babies[!is.na(babies)]
+countries <- names(babies)
+
+# income per capita, PPP adjusted
+tmp <- query(gm, "IncomePerCapita")
+income <- as.vector(tmp["2008"])
+names(income) <- names(tmp)
+income <- income[!is.na(income)]
+countries <- intersect(countries, names(income))
+
+# religion
+tmp <- query(gm, "MainReligion")
+religion <- tmp[,"Group"]
+names(religion) <- tmp[,"Entity"]
+religion[religion==""] <- "unknown"
+colcodes <- c(Christian="blue", "Eastern religions"="red", Muslim="green", "unknown"="grey")
+countries <- intersect(countries, names(religion))
+
+# plot
+plot(
+  x=income[countries], 
+  y=babies[countries], 
+  col=colcodes[religion[countries]], 
+  log="x",
+  xlab="Income per Person, PPP-adjusted", 
+  ylab="Babies per Woman"
+)
+legend(
+  "topright", 
+  legend=names(colcodes), 
+  fill=colcodes, 
+  border=colcodes
+)
+@
+
+One of the points Rosling wanted to make is: Religion has no or very little influence on fertility, but economic
+welfare has. I wonder if demographs agree and take this economic effect into account. 
+
+If you want to know more about that `gapminder` function and that `query` method, read on.
+
+<!-- more -->
+
+The result of calling `gapminder()` is an object of (S4) class `UrlData`. The class defines a three-step `query`
+process. Each step can be customized. The steps are
+
+ - Map the resource parameter to an URL.
+ - Extract the data from the web (i.e. download).
+ - Transform the data to a suitable R object.
+ 
+There is also a `scrape` method that adds a fourth step and stores the extracted and transformed data to a local
+sqlite database. But that is topic of another post and will not be covered here. 
+
+The `gapminder` function passes suitable parameters to the constructor for each of the steps. 
+
+## Map resource names to URLs
+
+Gapminder's datasets are hosted at Google Spreadsheets. Each dataset has a URL like
+"https://docs.google.com/spreadsheet/pub?key=%s&output=csv", where `%s` is a unique but unmemorizable key.
+The constructor `urldata` offers two parameters to handle this situation
+
+<<s1, echo=TRUE, eval=FALSE>>=
+gm <- urldata(
+  template="https://docs.google.com/spreadsheet/pub?key=%s&output=csv",
+  map.lst=list(
+    "TotalFertilityRate"="phAwcNAVuyj0TAlJeCEzcGQ&gid=0",
+    "IncomePerCapita"="phAwcNAVuyj1jiMAkmq1iMg&gid=0"
+  )
+)
+@
+
+When we provide these two parameters, on `query(gm, "IncomePerCapita")` the
+URL is constructed by calling `sprintf(template, map.lst[["IncomePerCapita"]])`.
+(It is possible to provide several parameters or to provide a function `map.fct` instead
+of `map.list`, but I do not go into that now.)
+
+## Extracting, i.e. downloading the data
+
+By default, `UrlData` uses `readLines` for downloading the dataset. In this example, this fails,
+at least on windows, since `readLines` does not support https. One solution proposed at
+[Stackoverflow](http://stackoverflow.com/questions/2665532/is-there-a-good-r-api-for-accessing-google-docs)
+is to use `RCurl::getURL` with suitable parameters. Thus the object construction becomes:
+
+<<s2, echo=TRUE, eval=FALSE>>=
+gm <- urldata(
+  template=#see above,
+  map.lst=#see above,
+  extract.fct=function(uri) 
+    getURL(
+      uri, 
+      cainfo = system.file(
+        "CurlSSL", 
+        "cacert.pem", 
+        package = "RCurl"
+      )
+    )
+)
+@
+
+Now, `query(gm, "IncomePerCapita")` returns the dataset as a vector of strings. Other use cases of `UrlData` may
+use `fromJSON`, `readLines(gzcon(uri))` or pass an authentication object to `getURL`.
+
+## Transform the raw data to an R object
+
+The last step of the `query` converts the raw data. It takes care of character encoding, separator and comment characters
+and type conversions. In the `gapminder` example, a call to `read.csv` is performed, followed by numerical conversions
+(due to the fact the 1000 char is not detected) and returns a `xts` object. It is passed as `transform.fct` parameter:
+
+<<s2, echo=TRUE, eval=FALSE>>=
+gm <- urldata(
+  template=#see above,
+  map.lst=#see above,
+  extract.fct=#see above,
+  transform.fct=function(x) {
+    dat <- read.csv(
+      textConnection(x), 
+      na.strings=c("..", "-"), 
+      stringsAsFactor=FALSE
+    )
+    # other steps omitted
+  }
+)
+@
+
+By default, no transformation is performed, i.e. the `identity` function is used. With this last
+customization, the `gm` object works as in the opening example. 
+
+## Conclusion and other examples
+
+The class `UrlData` introduced in this blog post aims to make it easy to access data from the web in a
+unified way. The class inherits from `Xdata` and hence takes advantage of the infrastructure provided
+by this class.
+
+As a proof of concept, I implemented other data objects. The following functions are part of the
+`datamart` package and can be inspected by looking at the source code, for example with
+`showMethods("query", includeDefs=TRUE)`. Most of the examples use code snippets of the R blogosphere:
+
+  - `mauna_loa`, simple example for CO2 data.
+  - `tourdefrance`, sports data collected by [Martin Theusrus](http://www.theusrus.de).
+  - `sourceforge`, access to JSON stats API for a given project.
+  - `gscholar`, counting hits for given search terms 
+    [Robert A. Muenchen](http://librestats.com/2012/04/12/statistical-software-popularity-on-google-scholar/)
+    
