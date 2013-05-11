@@ -2,7 +2,11 @@
 \alias{dbpedia}
 \title{A data object for querying dbpedia}
 \usage{
-  dbpedia()
+  dbpedia(lang = "")
+}
+\arguments{
+  \item{lang}{two-character language code for the dbpedia,
+  default ''}
 }
 \value{
   a Dbpedia object, inherited from Xsparql

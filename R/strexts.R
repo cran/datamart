@@ -1,3 +1,13 @@
+#' Capitalize a string
+#'
+#' The first character is uppercased, the other lowercased.
+#'
+#' @param s          character or character vector
+#'
+#' @return character 
+#' @export
+strcap <- function(s) paste(toupper(substr(s,1,1)), tolower(substring(s,2)), sep="")
+
 #' Get the last n letters
 #'
 #' if n>0, return the last n letters of x
@@ -96,7 +106,10 @@ strsubst <- function(template, map, verbose=getOption("verbose")) {
     sym <- substring(line, starts+2, starts+ml-2)
     repl <- map[sym]
     idx1 <- is.null(repl)
-    repl[idx1] <- sym[idx1]
+    if(length(idx1)>0) {
+      warning("Don't know how to replace '", sym, "'.")
+      repl[idx1] <- sym[idx1]
+    }
     norepl <- substring(line, c(1, starts+ml), c(starts-1, nchar(line)))
     res[[i]] <- paste(norepl, c(repl, ""), sep="", collapse="")
     if (verbose) cat("output: |", res[[i]], "|\n")

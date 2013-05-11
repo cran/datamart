@@ -7,10 +7,28 @@
 #' Please note that neither Gapminder nor the package developer/maintainer are the data provider, except for a few cases.
 #' Therefore you will have to go to the source to find out the terms of use for the specific indicator.
 #'
-#' @return an object of class UrlData
+#' This class defines some resources of the Gapminder Project.
+#' See \code{queries(gapminder())} for a list of resources.
+#'
+#' @examples
+#' \dontrun{
+#'   gm <- gapminder()
+#'   queries(gm)
+#'   query(gm, "ReligionAndBabies")
+#' }
+#' 
+#' @name Gapminder-class
+#' @rdname Gapminder-class
+#' @exportClass Gapminder
+setClass(Class="Gapminder", representation=representation(), contains="UrlData")
+
+#' Constructor for Gapminder class
+#'
+#' See Gapminder-class for details.
+#'
+#' @return Gapminder
 #' @references 
 #' \url{http://www.gapminder.org}
-#' @docType data
 #' @export
 gapminder <- function() urldata(
   template="https://docs.google.com/spreadsheet/pub?key=%s&output=csv",
@@ -87,7 +105,60 @@ gapminder <- function() urldata(
     "ArmsExports"="pyj6tScZqmEeTIhjRrVQtQA&gid=0",
     "ArmsImports"="pyj6tScZqmEfnPl7VRfT9WA&gid=0",
     "HumanDevelopmentIndex"="tyadrylIpQ1K_iHP407374Q&gid=0"
-  )
+  ),
+  clss="Gapminder"
 )
 
+#' @rdname query-methods
+#' @aliases query,Gapminder,ReligionAndBabies,missing-method
+setMethod(
+  f="query",
+  signature=c(self="Gapminder", resource=resource("ReligionAndBabies"), dbconn="missing"),
+  definition=function(self, resource, verbose=getOption("verbose"), ...) {
+    if(verbose) cat("query Gapminder#ReligionAndBabies\n")
 
+    # babies per woman
+    tmp <- query(self, "TotalFertilityRate")
+    babies <- as.vector(tmp["2008"])
+    names(babies) <- names(tmp)
+    babies <- babies[!is.na(babies)]
+    countries <- names(babies)
+    
+    # income per capita, PPP adjusted
+    tmp <- query(self, "IncomePerCapita")
+    income <- as.vector(tmp["2008"])
+    names(income) <- names(tmp)
+    income <- income[!is.na(income)]
+    countries <- intersect(countries, names(income))
+    
+    # religion
+    tmp <- query(self, "MainReligion")
+    religion <- tmp[,"Group"]
+    names(religion) <- tmp[,"Entity"]
+    religion[religion==""] <- "unknown"
+    colcodes <- c(
+      Christian="blue", 
+      "Eastern religions"="red", 
+      Muslim="green", "unknown"="grey"
+    )
+    countries <- intersect(countries, names(religion))
+    
+    # plot
+    par(mar=c(4,4,0,0)+0.1)
+    plot(
+      x=income[countries], 
+      y=babies[countries], 
+      col=colcodes[religion[countries]], 
+      log="x",
+      xlab="Income per Person, PPP-adjusted", 
+      ylab="Babies per Woman"
+    )
+    legend(
+      "topright", 
+      legend=names(colcodes), 
+      fill=colcodes, 
+      border=colcodes
+    )
+    return(invisible(NULL))
+  }
+)

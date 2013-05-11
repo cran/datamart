@@ -7,7 +7,7 @@
 #' 
 #' @name DataStoreDriver-class
 #' @rdname DataStoreDriver-class
-setClass(
+.DataStoreDriver <- setClass(
   Class="DataStoreDriver", 
   contains="SQLiteDriver"
 )
@@ -37,13 +37,8 @@ setClass(
 #' @param force.reload     default FALSE
 #' @param shared.cache     default FALSE
 data_store_driver <- function (max.con = 200L, fetch.default.rec = 500, force.reload = FALSE, shared.cache = FALSE) 
-{
-    config.params <- as.integer(c(max.con, fetch.default.rec))
-    force <- as.logical(force.reload)
-    cache <- as.logical(shared.cache)
-    id <- .Call("RS_SQLite_init", config.params, force, cache, PACKAGE = "RSQLite")
-    new("DataStoreDriver", Id = id)
-}
+    .DataStoreDriver(RSQLite::sqliteInitDriver(max.con, fetch.default.rec, force.reload, shared.cache))
+
 
 #' dbConnect method that creates a SQLiteDataStore
 #'

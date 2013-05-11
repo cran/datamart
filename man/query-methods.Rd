@@ -1,10 +1,13 @@
 \docType{methods}
 \name{query}
 \alias{query}
+\alias{query,Blogger,BlogPostIds,missing-method}
 \alias{query,Dbpedia,Nuts1,missing-method}
+\alias{query,Dbpedia,PlzAgs,missing-method}
 \alias{query,Evs,Categories,missing-method}
 \alias{query,Evs,Elasticities,missing-method}
 \alias{query,Evs,Elasticity,missing-method}
+\alias{query,Gapminder,ReligionAndBabies,missing-method}
 \alias{query,GScholar,character,missing-method}
 \alias{query,InternalData,character,missing-method}
 \alias{query,Mashup,character,missing-method}

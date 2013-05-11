@@ -1,0 +1,24 @@
+NULL
+NULL
+   vval 
+"xdata" 
+   vval 
+"xdata" 
+   vval 
+"xdata" 
+NULL
+    vname      vval 
+"Depends"   "xdata" 
+    vname      vval 
+"Depends"   "xdata" 
+    vname      vval 
+"Depends"   "xdata" 
+NULL
+NULL
+NULL
+     name     lbl             
+[1,] "weight" "weight"        
+[2,] "altq"   "Year of birth" 
+[3,] "hhg"    "Household size"
+[4,] ""       ""              
+[5,] ""       ""              

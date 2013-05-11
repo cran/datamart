@@ -3,9 +3,15 @@
 #' @rdname datamart-internal
 eurostat_data <- function() urldata(
   template="http://epp.eurostat.ec.europa.eu/NavTree_prod/everybody/BulkDownloadListing?file=data%%2F%s.tsv.gz",
-  extract.fct= function(uri) readLines(gzcon(url(uri))),
+  extract.fct= function(uri) {
+    tf <- tempfile()
+    content <- getBinaryURL(uri)
+    writeBin(content, tf)
+    return(tf)
+  },
   transform.fct=function(x) {
-    res <- read.csv(textConnection(x), na.strings=c(": ", "p"), stringsAsFactor=FALSE, sep="\t")
+    res <- read.csv(gzfile(x), na.strings=c(": ", "p"), stringsAsFactor=FALSE, sep="\t")
+    unlink(x)
     code <- strhead(colnames(res)[[1]], -5)
     code <- strsplit(code, "\\.")[[1]]
     tm <- as.Date(paste(substring(tail(colnames(res),-1),2),1,1,sep="-0"))

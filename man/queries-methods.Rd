@@ -1,6 +1,7 @@
 \docType{methods}
 \name{queries}
 \alias{queries}
+\alias{queries,InternalData-method}
 \alias{queries,Mashup-method}
 \alias{queries,UrlData-method}
 \alias{queries,Xdata-method}

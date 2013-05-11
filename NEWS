@@ -1,0 +1,64 @@
+﻿datamart Version 0.3.0
+------------------------------------------------------------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+*  The InternalData function has been rewritten and may behave different to prior versions.
+
+NEW FEATURES
+
+*  A build mechanism with the new generic build is introduced. The build method takes at least a Target object and 
+   a Location object. Examples for targets are swvreport and mdreport; examples for locations are DirectoryLocation and Blogger.
+   
+*  new function uconv to convert between measurement units. 
+
+
+MINOR FEATURES
+
+*  new UrlData example cityCoords
+
+*  first tests cases added
+
+*  NEWS added
+
+DEPRECATED AND DEFUNCT
+
+*  removed function wikisites
+
+datamart Version 0.2.0
+------------------------------------------------------------------------------
+
+NEW FEATURES
+
+* new fundamental class UrlData, with examples mauna_loa, iwv_online, be_bathing_water_quality,
+  sourceforge, gapminder, tourdefrance 
+
+* new fundamental class Mashup, with experimental example eurostat
+
+* mechanism for persistence, classes DataStoreDriver and SQLiteDataStore with adapted generics, and
+  new generics scrape and scrapes
+
+MINOR FEATURES
+
+* class GScholar for querying Google scholar (inherited from UrlData), with example
+  statsoft_popularity 
+
+* some string utility functions added, strhead, strtail, strencrypt, strdecrypt, strsubst, strparse, strrecode, strcap
+
+* mem.info introspection function
+
+
+datamart Version 0.1.0
+------------------------------------------------------------------------------
+
+NEW FEATURES
+
+* base class Xdata, with query and queries generics 
+
+* InternalData as one workhorse, Evs as example
+
+* Xsparql as second workhorse, Dbpedia as example
+
+* Twttr example
+
+

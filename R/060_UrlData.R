@@ -55,6 +55,13 @@ setMethod(
   f="query",
   signature=c(self="UrlData", resource="character", dbconn="missing"),
   definition=function(self, resource, verbose=getOption("verbose"), ...) {
+    ## first, look for queries in this class (and maybe in the datastore, if not ignore.db was passed)
+    if(verbose) cat("trying inherited method..\n")
+    ret <- try(callNextMethod(), silent=TRUE) 
+    if(!inherits(ret, "try-error")) return(ret)
+    
+    # if that went wrong, query the web
+    if(verbose) cat("trying to construct URL..\n")
     mapped <- self@map.fct(self, resource)
     if(is.null(mapped)) stop("invalid 'resource'. Use queries() to get a vector of available resources.")
     if(!inherits(mapped, "list")) mapped <- list(mapped)
@@ -75,7 +82,12 @@ setMethod(
 setMethod(
   f="queries",
   signature="UrlData",
-  definition=function(self) names(self@map.lst)
+  definition=function(self) { 
+    ret <- c(callNextMethod(), names(self@map.lst))
+    names(ret) <- NULL
+    ret <- ret[ret!="character"]
+    return(ret)
+  }
 )
 
 #' @rdname scrapes-methods

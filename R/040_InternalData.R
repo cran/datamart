@@ -10,7 +10,7 @@ setClass(
   Class="InternalData", 
   representation=representation(name="character", package="character", data_env="environment"), 
   contains="Xdata",
-  validity=function(object) if(!exists(object@name, object@data_env)) stop("error loading data")
+  validity=function(object) if(length(object@data_env)==0) stop("error loading data")
 )
 
 #' Constructor for InternalData objects
@@ -34,10 +34,18 @@ setMethod(
   f="query",
   signature=c(self="InternalData", resource="character", dbconn="missing"),
   definition=function(self, resource, ...) {
-    if(resource==self@name)
-      self@data_env[[self@name]]
-    else
-      callNextMethod()
+      if(resource %in% ls(envir=self@data_env))
+        self@data_env[[resource]]
+      else
+        callNextMethod()
   }
+)
+
+#' @rdname queries-methods
+#' @aliases queries,InternalData-method
+setMethod(
+  f="queries",
+  signature="InternalData",
+  definition=function(self) c(callNextMethod(), ls(envir=self@data_env))
 )
 

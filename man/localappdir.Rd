@@ -1,0 +1,20 @@
+\name{localappdir}
+\alias{localappdir}
+\title{Platform-independent local app folder}
+\usage{
+  localappdir(appname = "R", create = TRUE)
+}
+\arguments{
+  \item{appname}{subdir in local app folder, default "R"}
+
+  \item{create}{logical, default TRUE, create folder if
+  non-existent}
+}
+\value{
+  character
+}
+\description{
+  determines local app folder based on
+  Sys.info()["sysname"].
+}
+

@@ -17,6 +17,7 @@
 #' @rdname Xdata-class
 #' @exportClass Xdata
 setClass(Class="Xdata", representation=representation())
+setClass(Class="EmptySet", representation=representation(), contains="Xdata")
 
 #' Request data from data source
 #'
@@ -171,7 +172,8 @@ setMethod(
     proc_one <- function(md) tryCatch(attr(md, "target")[["resource"]], error=function(e) NULL) # md is of class MethodDefinition
     md_list <- findMethods("query", classes=c(class(self), names(getClass(class(self))@contains)))
     res <- sapply(md_list, proc_one)
-    res <- res[names(res)!="Xdata#character"]
+    res <- res[res!="character"]
+    names(res) <- NULL
     return(res)
   }
 )
