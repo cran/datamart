@@ -2,8 +2,9 @@
 \name{queries}
 \alias{queries}
 \alias{queries,InternalData-method}
+\alias{queries,Location-method}
 \alias{queries,Mashup-method}
-\alias{queries,UrlData-method}
+\alias{queries,UrlData3-method}
 \alias{queries,Xdata-method}
 \title{List resources}
 \arguments{

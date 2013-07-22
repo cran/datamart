@@ -2,21 +2,19 @@
 #'
 #' @param proj  name of the project
 #' @param from  when did the project start? Default "2008-01-01".
+#' @param clss  which clss to instantiate, default "UrlData3"
 #'
 #' @references
 #' \url{http://sourceforge.net/p/forge/documentation/}
 #' @export
-sourceforge <- function(proj, from="2008-01-01") {
+sourceforge <- function(proj, from="2008-01-01", clss="UrlData3") {
   if(missing(proj)) stop("'proj' parameter missing.")
-  now <- as.Date(Sys.time())
-  urldata(
-    template=paste("http://sourceforge.net/projects/", proj, "/files/stats/json?start_date=%s&end_date=%s", sep=""),
-    map.lst=list(
-      LastWeek=list(now - 7, now),
-      LastMonth=list(now - 30, now),
-      YearToDate=list(paste(strftime(now, "%Y"), 1,1, sep="-0"), now),
-      AllTime=list(from, now)
-    ), 
+  urldata3(
+    clss=clss,
+    resource="SourceforgeStats",
+    template=paste("http://sourceforge.net/projects/", proj, "/files/stats/json?start_date=$(from)&end_date=$(to)", sep=""),
+    from=function(x=from) strftime(as.Date(x), "%Y-%m-%d"),
+    to=function(x=NULL) if(is.null(x)) strftime(Sys.time(), "%Y-%m-%d") else strftime(as.Date(x), "%Y-%m-%d"),
     extract.fct=fromJSON, 
     transform.fct=function(x) {
       tbl <- x[["downloads"]]

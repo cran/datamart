@@ -3,6 +3,9 @@
 #' This class allows to query datasets that can be
 #' loaded with data(). Only read-only access.
 #' 
+#' @examples
+#' getSlots("InternalData")
+#' 
 #' @name InternalData-class
 #' @rdname InternalData-class
 #' @exportClass InternalData
@@ -20,19 +23,21 @@ setClass(
 #' @param clss  name of the class to create. Default InternalData, must be inherited from this class.
 #'
 #' @export
+#' @rdname InternalData-class
 internalData <- function(name, package=NULL, clss="InternalData") {
     e <- new.env()
     do.call("data", list(name=name, package=package, envir=e))
     new(clss, name=name, package=package, data_env=e)
 }
 
-#' For the InternalData class, one resource with the same name as the dataset is defined.
-#'
 #' @rdname query-methods
-#' @aliases query,InternalData,character,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,InternalData,character-method
 setMethod(
   f="query",
-  signature=c(self="InternalData", resource="character", dbconn="missing"),
+  signature=c(self="InternalData", resource="character"),
   definition=function(self, resource, ...) {
       if(resource %in% ls(envir=self@data_env))
         self@data_env[[resource]]
@@ -42,7 +47,10 @@ setMethod(
 )
 
 #' @rdname queries-methods
-#' @aliases queries,InternalData-method
+#' @name queries
+#' @export
+#' @docType methods
+#' @aliases queries queries,InternalData-method
 setMethod(
   f="queries",
   signature="InternalData",

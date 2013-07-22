@@ -3,25 +3,15 @@
 \alias{show}
 \alias{show,Blogger-method}
 \alias{show,DirectoryLocation-method}
+\alias{show,FileTarget-method}
+\alias{show,Pastebin-method}
 \alias{show,Target-method}
 \alias{show,Xdata-method}
-\title{Show method for Xdata}
-\arguments{
-  \item{object}{an Xdata object}
-
-  \item{object}{an Target object}
-
-  \item{object}{an Target object}
-
-  \item{object}{an Target object}
-}
+\title{Show Method for Xdata classes}
 \description{
-  Show method for Xdata
-
-  Show method for Directory
-
-  Show method for Target
-
-  Show method for Blogger
+  The \code{show} method for the Xdata class has been
+  adapted to display the class name. Some inherited classes
+  such DirectoryLocation or Blogger override this default
+  definition.
 }
 

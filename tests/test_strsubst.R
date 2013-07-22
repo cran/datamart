@@ -10,12 +10,6 @@ test_strsubst <- function() {
   print(strsubst("$(who) likes $(what)", list(who="tim", what="$10000"), verbose=verbose))
   print(strsubst("$(who) likes $$(what)", list(who="tim", what=10000), verbose=verbose))
 
-  # not indexable objects such as environments currently not supported
-  # evi <- new.env(); assign("who", "tim", envir=evi); assign("what", "kung pao", envir=evi)
-  # print(strsubst("$(who) likes $(what)", evi, verbose=verbose))
-  # print(strsubst("$(who) likes $", evi, verbose=verbose))
-  # print(strsubst("$(unresolved) likes $(what)", evi, verbose=verbose))
-
   # vector of strings
   print(
     strsubst(

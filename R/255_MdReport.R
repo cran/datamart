@@ -2,9 +2,9 @@
 #' 
 #' The main S4 class in this framework is \code{MdReport}. You can
 #' create a report with \code{mdreport}, which takes a template file name,
-#' and a list of variables as arguments. The new generic method \code{build}. 
-#' can then be used to actually produce the report in various formats (markdown,
-#' xhtml).
+#' and a list of variables as arguments. The new generic method \code{put}. 
+#' can then be used to actually produce the report at various locations
+#' (directory, memory, blogging site).
 #'
 #' \code{strsubst} is a simple
 #' templating mechanism inspired from Python (PEP-0292).
@@ -12,13 +12,15 @@
 #' dollar sign and get replaced with the value
 #' of the corresponding variables passed to \code{strsubst}.
 #'
+#' @examples
+#' getSlots("MdReport")
+#'
 #' @name MdReport-class
 #' @rdname MdReport-class
 #' @exportClass MdReport
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 setClass(
     Class="MdReport", 
-    representation=representation(tpl="character", vars="list"),
+    representation=representation(tpl="character", vars="list", xdata="Xdata"),
     contains="Target"
 )
 
@@ -28,13 +30,16 @@ setClass(
 #'
 #' @param tpl         path to markdown template file
 #' @param name        name of the Report, default ''
+#' @param xdata       instance of Xdata class
 #' @param verbose     diagnostic messages T/F
 #' @param clss        class of the object, default 'MdReport'
 #' @param ...         number of targets
 #'
 #' @return generic
 #' @export
-mdreport <- function(tpl, name="", clss="MdReport", verbose=getOption("verbose"), ...) {
+#' @rdname MdReport-class
+mdreport <- function(tpl, name="", xdata=NULL, clss="MdReport", verbose=getOption("verbose"), ...) {
+  if(is.null(xdata)) xdata <- new("EmptySet")
   # handle subtargets
   vars <- list(...)
   idx <- which(names(vars)=="")
@@ -59,14 +64,13 @@ mdreport <- function(tpl, name="", clss="MdReport", verbose=getOption("verbose")
   for (l in tpl) {
       body_start <- body_start + 1
       if(grepl("^[\\s]*$", l, perl=TRUE)) break
-      m <- strparse("^[\\s]+(?<vval>.*)", l) # continuation line?
+      m <- strparse("^[\\s]+(?<vval>.*)", l)[[1]] # continuation line?
       if(!is.null(m)) {
           if(vname=="") stop("invalid header.")
           vars[[vname]] <- paste(vars[[vname]], m[["vval"]])
           next
       }
-      #browser()
-      m <- strparse("^(?<vname>[^:\\s]+)[\\s]*:[\\s]*(?<vval>.*)$", l) # meta?
+      m <- strparse("^(?<vname>[^:\\s]+)[\\s]*:[\\s]*(?<vval>.*)$", l)[[1]] # meta?
       if(!is.null(m)) {
           vname <- strcap(m[["vname"]])
           vars[[vname]] <- m[["vval"]]
@@ -89,68 +93,45 @@ mdreport <- function(tpl, name="", clss="MdReport", verbose=getOption("verbose")
   tpl <- paste(tpl, collapse="\n")
   
   # instantiate
-  new(clss, name=name, tpl=tpl, vars=vars)
+  new(clss, name=name, tpl=tpl, vars=vars, xdata=xdata)
 }
 
-#' @rdname build-methods
-#' @aliases build,MdReport,DirectoryLocation,Xdata-method
+#' @rdname put-methods
+#' @name put
+#' @export
+#' @docType methods
+#' @aliases put put,MdReport,Location-method
 setMethod(
-  f="build",
-  signature=c(target="MdReport", where="DirectoryLocation", xdata="Xdata"),
-  definition=function(target, where, xdata) {
-    tgts <- lapply(target@vars, function(v) as.character(build(target=v, where=where, xdata=xdata)))
-    subj <- tgts[["Subject"]]
-    if(is.null(subj)) subj <- "Untitled"
-    mdlines <- strsubst(target@tpl, tgts)
-    html <- markdownToHTML(
-      text=mdlines,
-      options=c("safelink", "escape", "use_xhtml", "smartypants"),
-      title=subj,
-      extensions=NULL
-    )
-    htmlfile <- target@name
-    if(htmlfile=="") htmlfile <- basename(tempfile(pattern="Rplot", tmpdir="", fileext=""))
-    htmlfile <- paste(htmlfile, "html", sep=".")
-    writeLines(html, file.path(as.character(where), htmlfile))
-    return(htmlfile)
-  }
-)
+  f="put",
+  signature=c(target="MdReport", where="Location"),
+  definition=function(target, where, draft=TRUE, overwrite=TRUE, ...) {
+    pat <- "\\$\\((?<name>[^\\)]+)\\)"
+    mem <- new("MemoryLocation")
+    tgts <- unique(unlist(strparse(pat, target@tpl)))
+    vars <- target@vars
+    for (tg in tgts) {
+        tgv <- vars[[tg]]
+        if(inherits(tgv, "Target")) vars[[tg]] <- put(tgv, mem)
+        # if(is.null(tgv)) 
+        vars[[tg]] <- as.character(put(target=v, where=mem))
+    }
 
-#' @rdname build-methods
-#' @aliases build,MdReport,MemoryLocation,Xdata-method
-setMethod(
-  f="build",
-  signature=c(target="MdReport", where="MemoryLocation", xdata="Xdata"),
-  definition=function(target, where, xdata, ...) {
-    tgts <- lapply(target@vars, function(v) as.character(build(target=v, where=where, xdata=xdata)))
-    mdlines <- strsubst(target@tpl, tgts)
+    mdlines <- strsubst(target@tpl, vars)
     html <- markdownToHTML(
       text=mdlines,
       options=c("safelink", "escape", "use_xhtml", "fragment_only", "smartypants"),
       extensions=NULL
     )
-    return(html)
-  }
-)
-
-#' @rdname build-methods
-#' @aliases build,MdReport,Blogger,Xdata-method
-setMethod(
-  f="build",
-  signature=c(target="MdReport", where="Blogger", xdata="Xdata"),
-  definition=function(target, where, xdata, draft=TRUE, overwrite=FALSE, ...) {
-    mem <- new("MemoryLocation")
-    html <- build(target, mem, xdata)
     
-    subj <- target@vars[["Subject"]]
-    if(inherits(subj, "Target")) subj <- build(subj, mem, xdata)
+    subj <- vars[["Subject"]]
+    if(inherits(subj, "Target")) subj <- put(target=subj, where=mem)
     if(!is.character(subj)) subj <- "Untitled"
     
     keyw <- target@vars[["Keywords"]]
-    if(inherits(keyw, "Target")) keyw <- build(keyw, mem, xdata)
-    if(!is.character(keyw)) keyw <- NULL
+    if(inherits(keyw, "Target")) keyw <- put(target=keyw, where=mem)
+    if(!is.character(keyw)) keyw <- ""
     
-    return(post(where, posttitle=subj, content=html, label=keyw, draft=draft, overwrite=overwrite))
+    put(blogpost(name=subj, content=html, label=keyw, draft=draft, overwrite=overwrite, ...), where)
   }
 ) 
 

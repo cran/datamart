@@ -1,4 +1,56 @@
-﻿datamart Version 0.3.0
+datamart Version 0.4.2
+------------------------------------------------------------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+*  The data object returned by sourceforge() now has only one resource "SourceforgeStats" and additional parameters
+   from and to. The sourceforge() function accepts a optional clss parameter.
+   
+*  The data object returned by city_coords() now has only one resource "CityCoordinates" and takes additional parameters
+   city and country (optional, default DE).
+
+NEW FEATURES
+
+*  A new generic with the name "put" is introduced.
+
+*  A new generic "meta" for Location classes is introduced and implemented for Blogger and DirectoryLocation.
+
+
+MINOR FEATURES
+
+*  new UrlData3 example netConnectGermany
+
+*  new Mashup / UrlData3 example eurostat_web
+
+*  new UrlData3 example oddsportal
+
+*  Bugfix for uconv, check for valid temperature units added.
+
+*  Bugfix for strsubst, unhelpful error message when one escape sequence is invalid fixed..
+
+*  Fixed test for strsubst. Added minimal first test for uconv.
+
+*  Worked on the documentation, it is still not satisfactory.
+
+*  Moved "Depends" to "Imports", removed dependency on RSQLite package.
+
+
+DEPRECATED AND DEFUNCT
+
+*  urldata and urldata2 have been removed. Instead, urldata3 is the way to go. The first official version
+   of the package (1.0) will rename urldata3 to urldata.
+   
+*  The naming "build" was not a good idea and has been removed. It is now called "put".
+
+*  The unitsets CrudeOil and GaseousFuels have been removed. They are now part of "Energy". The code for the "uconv"
+   function has been rewritten. 
+
+*  The mauna_loa, tour_de_france, gscholar and gapminder dataset have been removed. First need to look into into it. May return in later versions.
+
+*  The DataStore concept has been removed. The "put" generic will replace that.
+
+
+datamart Version 0.3.2
 ------------------------------------------------------------------------------
 
 SIGNIFICANT USER-VISIBLE CHANGES
@@ -17,9 +69,11 @@ MINOR FEATURES
 
 *  new UrlData example cityCoords
 
+*  simplified constructor for class DataStoreDriver
+
 *  first tests cases added
 
-*  NEWS added
+*  NEWS file added
 
 DEPRECATED AND DEFUNCT
 

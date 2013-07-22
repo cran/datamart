@@ -7,7 +7,7 @@
 \arguments{
   \item{template}{character with $(VARS)}
 
-  \item{map}{object with [ functionality e.g. a list.
+  \item{map}{object with [ functionality e.g. a vector.
   Should return values that can be coerced to character}
 
   \item{verbose}{print debugging messages when TRUE,

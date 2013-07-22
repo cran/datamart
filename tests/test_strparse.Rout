@@ -1,24 +1,60 @@
+[[1]]
 NULL
+
+[[1]]
 NULL
+
+[[1]]
    vval 
 "xdata" 
+
+[[1]]
    vval 
 "xdata" 
+
+[[1]]
    vval 
 "xdata" 
+
+[[1]]
 NULL
+
+[[1]]
     vname      vval 
 "Depends"   "xdata" 
+
+[[1]]
     vname      vval 
 "Depends"   "xdata" 
+
+[[1]]
     vname      vval 
 "Depends"   "xdata" 
+
+[[1]]
 NULL
+
+[[1]]
 NULL
+
+[[1]]
 NULL
-     name     lbl             
-[1,] "weight" "weight"        
-[2,] "altq"   "Year of birth" 
-[3,] "hhg"    "Household size"
-[4,] ""       ""              
-[5,] ""       ""              
+
+[[1]]
+    name      lbl 
+"weight" "weight" 
+
+[[2]]
+           name             lbl 
+         "altq" "Year of birth" 
+
+[[3]]
+            name              lbl 
+           "hhg" "Household size" 
+
+[[4]]
+NULL
+
+[[5]]
+NULL
+

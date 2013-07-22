@@ -2,24 +2,11 @@
 \name{datamart}
 \alias{datamart}
 \alias{datamart-package}
-\title{Common interface to various data sources.}
+\title{Unified interface to your data sources.}
 \description{
-  datamart provides several S4 classes to access and cache
-  data sources on the internet or elsewhere. Its aim is to
-  extent the functionality of the data() function by
-  enabling parametrized data requests and offering a data
-  update process.
-}
-\details{
-  At the heart of datamart are two new methods: With
-  query() you actually use your data source and request
-  some data. With scrape() you curate your data, that is,
-  you may provide a mechanism to akquire new data.
-
-  The datamart package provides basic infrastructure for
-  the data collection, i.e. the generic methods, and some
-  examples to prove the concept. The package is inspired by
-  the
+  This package provides several S4 classes that make it
+  easier to collect and work with datasets. The package is
+  inspired by the
   \href{https://bitbucket.org/ScraperWiki/scraperwiki}{scraperwiki
   project}, which provides a webbased service for data
   collection. Also inspiring are
@@ -27,8 +14,33 @@
   xxxData functions}, which provide in-built parametrizable
   datasets.
 }
+\details{
+  You can specify web resources with the \code{urldata3}
+  and the \code{xsparql} functions. You can combine several
+  resources with the \code{mashup} function. For working
+  with locally saved data, see the \code{internalData}
+  function. The objects instantiated with these functions
+  can than be passed to the generic \code{query} along with
+  some parameters to get to the data.
+
+  Besides parameterized queries ("read" operations), the
+  package also aims to support "write" operations. For this
+  purpose, some functions (currently \code{mdreport},
+  \code{swvreport}) for defining targets as well as some
+  functions (currently \code{blogger} and \code{dirloc})
+  for defining locations are provided. The generic
+  \code{put} then builds the target and puts it at the
+  defined location.
+
+  Some examples aim to proof the concept, for instance
+  \code{eurostat_web}, \code{sourceforge},
+  \code{oddsportal}, and \code{city_coords}.
+
+  The package is highly experimental, and likely to change
+  heavily without backward compatiblity.
+}
 \references{
-  Karsten W.,
+  Karsten Weinert,
   \href{http://factbased.blogspot.com/search/label/datamart}{factbased
   blogspot.}
 }

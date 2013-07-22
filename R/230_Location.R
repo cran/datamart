@@ -1,62 +1,34 @@
 #' S4 base class to represent output Locations
 #'
+#' The \code{Location} class is an abstract class that 
+#' represents a place where to put something.
+#'
 #' @name Location-class
 #' @rdname Location-class
 #' @exportClass Location
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
-setClass(Class="Location", representation=representation())
+setClass(Class="Location", representation=representation(), contains="Xdata")
+
+#' @rdname queries-methods
+#' @name queries
+#' @export
+#' @docType methods
+#' @aliases queries queries,Location-method
+setMethod(
+  f="queries",
+  signature=c("Location"),
+  definition=function(self) c(rownames(meta(self)), callNextMethod())
+)
 
 #' S4 base class to represent output in Memory
+#'
+#' The \code{MemoryLocation} class represents the place in the memory of
+#' the current R process.
+#' 
+#' @examples
+#' getSlots("MemoryLocation")
 #'
 #' @name MemoryLocation-class
 #' @rdname MemoryLocation-class
 #' @exportClass MemoryLocation
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
 setClass(Class="MemoryLocation", representation=representation(), contains="Location")
 
-#' Directory location
-#'
-#' @name DirectoryLocation-class
-#' @rdname DirectoryLocation-class
-#' @exportClass DirectoryLocation
-#' @author Karsten Weinert \email{k.weinert@@gmx.net}
-setClass(
-  Class="DirectoryLocation", 
-  representation=representation(path="character"), 
-  contains="Location",
-  validity=function(object) 
-    if(!isTRUE(file.info(object@path)$isdir)) stop("invalid path argument, seems not to be a directory")
-)
-
-#' Show method for Directory
-#'
-#' @param object    an Target object
-#'
-#' @docType methods
-#' @name show
-#' @rdname show-methods
-#' @aliases show,DirectoryLocation-method
-#' @export
-setMethod(
-  f="show",
-  signature="DirectoryLocation",
-  definition=function(object) cat(sprintf("<Local Directory @ %s>\n", object@path))
-)
-
-#' as.character method for Directory
-#'
-#' This method returns the path to the directory
-#' it represents.
-#'
-#' @param a Directory object
-#'
-#' @docType methods
-#' @name as.character
-#' @rdname as.character-methods
-#' @aliases as.character,DirectoryLocation-method
-#' @export
-setMethod(
-  f="as.character",
-  signature="DirectoryLocation",
-  definition=function(x) x@path
-)

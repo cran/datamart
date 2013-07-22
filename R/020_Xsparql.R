@@ -5,6 +5,9 @@
 #'
 #' See \code{Dbpedia} for examples.
 #' 
+#' @examples
+#' getSlots("Xsparql")
+#' 
 #' @name Xsparql-class
 #' @rdname Xsparql-class
 #' @exportClass Xsparql
@@ -18,19 +21,20 @@ setClass(
   }
 )
 
-#' Constructor for Xsparql
+#' The function \code{xsparql} constructs a Xsparql object.
 #'
 #' @param url       sparql end point
 #' @param nspace        character vector with short name / namespace expansions
 #'
 #' @return a xsparql object
 #' @export
+#' @rdname Xsparql-class
 xsparql <- function(url, nspace="") {
   res <- new("Xsparql", url=url, nspace=nspace)
   return(res)
 }
 
-#' internal query method for SPARQL end points
+#' Internal query method for SPARQL end points
 #'
 #' Internal function, use query(xsparql(), ...) instead.
 #'
@@ -39,14 +43,14 @@ xsparql <- function(url, nspace="") {
 #' @param typeconv   if TRUE (default), converts numbers and dates to R types
 #' @param verbose    if TRUE, print diagnostic messages. Defaults to getOption("verbose")
 #'
-#' @return a data.frame object
+#' @return data.frame object
 #' @author see SPARQL package
 mySPARQL <- function (url, query, typeconv=TRUE, verbose=getOption("verbose")) {
   if (url=="") stop("missing url")
   if (query=="") stop("missing query")
   if(verbose) cat(paste(url, "?query=", URLencode(query), sep = ""),"\n")
     
-  js <- fromJSON(getURL(
+  js <- RJSONIO::fromJSON(getURL(
           paste(url, "?query=", URLencode(query), sep = ""), 
           httpheader = c(Accept = "application/sparql-results+json")
         )
@@ -82,17 +86,14 @@ mySPARQL <- function (url, query, typeconv=TRUE, verbose=getOption("verbose")) {
   return(data.frame(res))
 }
 
-#' For the Xsparql class the query method relies on code of the authors of the SPARQL package.
-#' The resource parameter is interpreted als SPARQL statement, optional parameters are: 
-#' maxrows (numeric, default=NULL) for limit the rows to fetch, 
-#' interactive (logical, default FALSE) asks for user input before fetching next rows,
-#' typeconv (logical, default TRUE) to convert numbers and dates to R types
-#'
 #' @rdname query-methods
-#' @aliases query,Xsparql,character,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,Xsparql,character-method
 setMethod(
   f="query",
-  signature=c(self="Xsparql", resource="character", dbconn="missing"),
+  signature=c(self="Xsparql", resource="character"),
   definition=function(self, resource, maxrows=NULL, interactive=FALSE, typeconv=TRUE, verbose=getOption("verbose")) {
     if(verbose) cat("query Xsparql#res=", resource, "\n")
     r <- try(new(resource), silent=TRUE)

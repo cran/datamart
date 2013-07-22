@@ -1,6 +1,6 @@
 \name{mySPARQL}
 \alias{mySPARQL}
-\title{internal query method for SPARQL end points}
+\title{Internal query method for SPARQL end points}
 \usage{
   mySPARQL(url, query, typeconv = TRUE,
     verbose = getOption("verbose"))
@@ -17,7 +17,7 @@
   Defaults to getOption("verbose")}
 }
 \value{
-  a data.frame object
+  data.frame object
 }
 \description{
   Internal function, use query(xsparql(), ...) instead.

@@ -1,0 +1,32 @@
+\name{Pastebin-class}
+\alias{pastebin}
+\alias{Pastebin-class}
+\title{Pastebin}
+\usage{
+  pastebin(api_dev_key = getOption("pastebin.api_dev_key"),
+    api_user_name = getOption("pastebin.api_user_name"),
+    api_user_password = getOption("pastebin.api_user_password"),
+    clss = "Pastebin")
+}
+\arguments{
+  \item{api_dev_key}{API Dev Key, default
+  getOption("pastebin.api_dev_key")}
+
+  \item{api_user_name}{API User Name, default
+  getOption("pastebin.api_user_name")}
+
+  \item{api_user_password}{API User password, default
+  getOption("pastebin.api_user_password")}
+
+  \item{clss}{Class name to initiate, default "Pastebin"}
+}
+\description{
+  This class exposes partially the Web API to the pastebin
+  service.
+
+  see Pastebin class for more information
+}
+\examples{
+getSlots("Pastebin")
+}
+

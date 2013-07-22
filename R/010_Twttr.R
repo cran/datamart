@@ -9,7 +9,7 @@
 #' @exportClass Twttr
 #' @examples
 #' \dontrun{
-#'   tw <- twttr(user="wagezudenken")
+#'   tw <- twttr(user="karstengweinert")
 #'   query(tw, "User_timeline")
 #' }
 setClass(Class="Twttr", representation=representation(user="character"), contains="Xdata")
@@ -22,20 +22,20 @@ setClass(Class="Twttr", representation=representation(user="character"), contain
 #' @param user  character, twitter screenname
 #'
 #' @export
+#' @rdname Twttr-class
 twttr <- function(user="") {
   res <- new("Twttr", user=user)
   return(res)
 }
 
-#' For the Twttr class, the query method provides additional optional arguments:
-#' user (twitter screenname, default self@@user), since_id (character, only tweets with newer id, default NULL),
-#' count (numerical, maximum tweets, default NULL)
-#'
 #' @rdname query-methods
-#' @aliases query,Twttr,User_timeline,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,Twttr,User_timeline-method
 setMethod(
   f="query",
-  signature=c(self="Twttr", resource=resource("User_timeline"), dbconn="missing"),
+  signature=c(self="Twttr", resource=resource("User_timeline")),
   definition=function(self, resource, user=NULL, since_id=NULL, count=NULL, verbose=getOption("verbose")) {
     if(is.null(user))  user <- self@user
     

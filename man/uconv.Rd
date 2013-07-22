@@ -1,0 +1,46 @@
+\name{uconv}
+\alias{uconv}
+\alias{unitsetmanager}
+\alias{UnitSetManager-class}
+\title{Convert between numerical units}
+\usage{
+  uconv(x, from, to, uset = NULL)
+
+  unitsetmanager()
+}
+\arguments{
+  \item{x}{numerical vector}
+
+  \item{from}{character, unit to convert from.}
+
+  \item{to}{character, unit to convert to}
+
+  \item{uset}{optional, character, unit set to use.}
+}
+\description{
+  This function converts between numerical units. It works
+  similar to the \code{iconv} function: You provide vector
+  \code{x} and a \code{from} and a \code{to} unit name and
+  the function converts.
+
+  This is an internal class. It administers the unitsets
+  used by the \code{uconv} method. One instance, usually
+  the only one, is created at startup.
+
+  Internal function to create an UnitSetManager object.
+}
+\details{
+  Additionally, you may provide a unitset name. Here, the
+  analogy to \code{iconv} ceases. Think of unitset as a
+  dimension of units, or a context for units. Predefined
+  unitsets are "Length", "Mass", "Energy", and
+  "Temperature". It is recommened to provide the unitset
+  name. A list of available unitsets and the units defined
+  by them can be obtained with \code{uconvlist()}.
+}
+\examples{
+uconv(1, "horse length", "m", "Length")
+uconv(1:10, "TWh", "PJ", "Energy")
+getSlots("UnitSetManager")
+}
+

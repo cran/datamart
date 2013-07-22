@@ -1,12 +1,23 @@
 \name{Mashup-class}
+\alias{mashup}
 \alias{Mashup-class}
 \title{Mashup -- A class for combining Xdata objects}
+\usage{
+  mashup(..., clss = "Mashup")
+}
+\arguments{
+  \item{...}{named arguments of Xdata objects}
+
+  \item{clss}{name of the class to create. Default Mashup,
+  must be inherited from this class.}
+}
 \description{
   This class administers a list of Xdata objects and
-  delegates \code{query} and \code{scrape} and other
-  methods to them. The aim of the class is to support the
-  operation of combining different data sources into one
-  data object.
+  delegates \code{query} and other methods to them. The aim
+  of the class is to support the operation of combining
+  different data sources into one data object.
+
+  Constructor for Mashup objects
 }
 \details{
   Instances of this class also maintain a database
@@ -14,14 +25,12 @@
   connection is shared among the administered Xdata
   instances.
 
-  It is possible to suppress \code{scrape} operation by
-  setting the slot \code{read.only=TRUE}. This is useful if
-  the database is part of a package and is not to be
-  altered (except for package updates).
-
   Usually it is not necessary for inherited classes to
-  redefine the \code{queries, scrape} or \code{scrapes}
-  methods. Rather, it is recommended to add \code{query}
-  methods with new signatures in the resource slot.
+  redefine the \code{queries} method. Rather, it is
+  recommended to add \code{query} methods with new
+  signatures in the resource slot.
+}
+\examples{
+getSlots("Mashup")
 }
 

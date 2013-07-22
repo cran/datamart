@@ -8,7 +8,7 @@
   iwv_online
 }
 \value{
-  a UrlData object
+  UrlData3 object
 }
 \description{
   website traffic as tracked by iwv online. Use yyyymm for

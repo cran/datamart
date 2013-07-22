@@ -3,13 +3,17 @@
 #' website traffic as tracked by iwv online.
 #' Use yyyymm for query() as resource.
 #'
-#' @return a UrlData object
+#' @return UrlData3 object
 #' @references 
 #' \url{http://en.wikipedia.org/wiki/Informationsgemeinschaft_zur_Feststellung_der_Verbreitung_von_Werbetraegern}
 #' @docType data
 #' @export
-iwv_online <- function() urldata(
-  template="http://ausweisung.ivw-online.de/i.php?s=1&mz=%s&csv=1", # s defines the detail level 1:3
+iwv_online <- function() urldata3(
+  resource="Iwv",
+  template="http://ausweisung.ivw-online.de/i.php?s=$(detail_level)&mz=$(year)$(month)&csv=1", # s defines the detail level 1:3
+  detail_level=1,
+  year=strftime(Sys.time(), "%Y"),
+  month=strftime(Sys.time(), "%m"), 
   extract.fct=readLines,
   transform.fct=function(x) {
     i <- min(which(x==""))

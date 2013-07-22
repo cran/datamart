@@ -3,17 +3,10 @@
 \alias{as.character}
 \alias{as.character,DirectoryLocation-method}
 \alias{as.character,Resource-method}
-\title{as.character method for Resource}
-\arguments{
-  \item{a}{Resource object}
-
-  \item{a}{Directory object}
-}
+\title{The as.character for Xdata/Resource}
 \description{
-  This method returns the class of itself. It is just the
-  identifier of the resource.
-
-  This method returns the path to the directory it
-  represents.
+  The \code{as.character} method has been defined for
+  various classes, such as the \code{Resource} class and
+  the \code{DirectoryLocation} class.
 }
 

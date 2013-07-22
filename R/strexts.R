@@ -84,7 +84,7 @@ strdecrypt <- function(message) {
 #' Substitutions are marked by $(NAME).
 #'
 #' @param template   character with $(VARS)
-#' @param map        object with [ functionality e.g. a list. Should return
+#' @param map        object with [ functionality e.g. a vector. Should return
 #'                   values that can be coerced to character
 #' @param verbose    print debugging messages when TRUE, default is getOption("verbose")
 #'
@@ -96,6 +96,7 @@ strdecrypt <- function(message) {
 strsubst <- function(template, map, verbose=getOption("verbose")) {
   pat <- "\\$\\([^\\)]+\\)"
   res <- template
+  map <- unlist(map)
   m <- gregexpr(pat, template)
   idx <- which(sapply(m, function(x) x[[1]]!=-1)) # faster than 1:length(template)?
   for (i in idx) {
@@ -104,44 +105,18 @@ strsubst <- function(template, map, verbose=getOption("verbose")) {
     starts <- m[[i]]
     ml <- attr(m[[i]], "match.length")
     sym <- substring(line, starts+2, starts+ml-2)
+    if(verbose) cat("sym: |", sym, "|\n")
     repl <- map[sym]
-    idx1 <- is.null(repl)
-    if(length(idx1)>0) {
-      warning("Don't know how to replace '", sym, "'.")
-      repl[idx1] <- sym[idx1]
+    idx1 <- is.na(repl) 
+    if(sum(idx1)>0) {
+      warning("Don't know how to replace '", paste(sym[idx1], collapse="', '"), "'.")
+      repl[idx1] <- paste("$(",sym[idx1],")", sep="")
     }
     norepl <- substring(line, c(1, starts+ml), c(starts-1, nchar(line)))
     res[[i]] <- paste(norepl, c(repl, ""), sep="", collapse="")
     if (verbose) cat("output: |", res[[i]], "|\n")
   }
   return(res)
-}
-
-#' Parse named patterns
-#'
-#' code based on examples for regexpr()
-#'
-#' @param x          character or character vector
-#' @param pat        named pattern
-#'
-#' @return named character vector or matrix
-#' @export
-strparse <- function(pat, x) {
-    parsed <- regexpr(pat, x, perl=TRUE)
-    if (length(x)==1) {
-        if(parsed[1]==-1) return(NULL)
-        st <- attr(parsed, "capture.start")[1,]
-        m <- substring(x, st, st + attr(parsed, "capture.length")[1,]-1)
-        names(m) <- attr(parsed, "capture.names")
-    } else {
-        m <- do.call(rbind, lapply(seq_along(parsed), function(i) {
-            if(parsed[i] == -1) return("")
-            st <- attr(parsed, "capture.start")[i, ]
-            substring(x[i], st, st + attr(parsed, "capture.length")[i, ] - 1)
-        }))
-        colnames(m) <- attr(parsed, "capture.names")
-    }
-    return(m)
 }
 
 #' Pattern-based recoding
@@ -162,5 +137,29 @@ strrecode <- function(pats, repls, x, ...) {
         hits[!hits][new_hits] <- TRUE
         if(all(hits)) break
     }
+    return(res)
+}
+
+#' Parse named patterns
+#'
+#' code based on examples for regexpr()
+#'
+#' @param x          character or character vector
+#' @param pat        named pattern
+#'
+#' @return named character vector or matrix
+#' @export
+strparse <- function(pat, x) {
+    parsed <- gregexpr(pat, x, perl=TRUE)
+    fun <- function(i) if(parsed[[i]][[1]]==-1) {
+        return(NULL)
+    } else {
+        st <- attr(parsed[[i]], "capture.start")
+        m <- substring(x[[i]], st, st - 1 + attr(parsed[[i]], "capture.length"))
+        nm <- attr(parsed[[i]], "capture.names")
+        names(m) <- rep(nm, length(m)/length(nm))
+        return(m)
+    }
+    res <- lapply(seq_along(x), fun)
     return(res)
 }

@@ -16,12 +16,13 @@
 setClass(Class="Dbpedia", representation=representation(), contains="Xsparql")
 
 
-#' A data object for querying dbpedia
+#' Constructor for Dbpedia objects
 #'
 #' @param lang   two-character language code for the dbpedia, default ''
 #'
 #' @return a Dbpedia object, inherited from Xsparql
 #' @export
+#' @rdname Dbpedia-class
 dbpedia <- function(lang="") {
     res <- new("Dbpedia",
         url=paste("http://", lang, if(lang!="") ".", "dbpedia.org/sparql", sep=""),
@@ -42,10 +43,13 @@ dbpedia <- function(lang="") {
 }
 
 #' @rdname query-methods
-#' @aliases query,Dbpedia,Nuts1,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,Dbpedia,Nuts1-method
 setMethod(
   f="query",
-  signature=c(self="Dbpedia", resource=resource("Nuts1"), dbconn="missing"),
+  signature=c(self="Dbpedia", resource=resource("Nuts1")),
   definition=function(self, resource, verbose=getOption("verbose"), ...) {
     if(verbose) cat("query Dbpedia#Nuts1\n")
     stmt <- paste(
@@ -66,10 +70,13 @@ setMethod(
 )
 
 #' @rdname query-methods
-#' @aliases query,Dbpedia,PlzAgs,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,Dbpedia,PlzAgs-method
 setMethod(
   f="query",
-  signature=c(self="Dbpedia", resource=resource("PlzAgs"), dbconn="missing"),
+  signature=c(self="Dbpedia", resource=resource("PlzAgs")),
   definition=function(self, resource, verbose=getOption("verbose"), ...) {
     if(verbose) cat("query Dbpedia#PlzAgs\n")
     stmt <- paste(

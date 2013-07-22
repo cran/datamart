@@ -6,14 +6,11 @@
 #' @exportClass Target
 setClass(Class="Target", representation=representation(name="character"))
 
-#' Show method for Target
-#'
-#' @param object    an Target object
-#'
-#' @docType methods
-#' @name show
 #' @rdname show-methods
-#' @aliases show,Target-method
+#' @name show
+#' @export
+#' @docType methods
+#' @aliases show show,Target-method
 #' @export
 setMethod(
   f="show",

@@ -1,5 +1,10 @@
 #' German Income and Expenditure Survey 2008 on private spendings, differentiated by household type and household income.
 #'
+#' Germany's Sample survey of income and expenditure (Einkommens- und Verbrauchsstichprobe, EVS) is conducted by the
+#' Federal Statistical Office. The data provided here is processed and is not identical with der Federal Office' data.
+#' Some information is lost by the processing. If you want more and/or more accurate data,
+#' contact the Federal Statistical Office.
+#'
 #' @name Evs-class
 #' @rdname Evs-class
 #' @aliases evs2008.lvl2
@@ -18,26 +23,20 @@ setClass(
 
 #' Constructor for Evs data source class
 #'
-#' Germany's Sample survey of income and expenditure (Einkommens- und Verbrauchsstichprobe, EVS) is conducted by the
-#' Federal Statistical Office. The data provided here is processed and is not identical with der Federal Office' data.
-#' Some information is lost by the processing. If you want more and/or more accurate data,
-#' contact the Federal Statistical Office.
-#'
 #' @return an object of class "Evs"
 #' @export
+#' @rdname Evs-class
 expenditures <- function() internalData(name="evs2008.lvl2", package="datamart", clss="Evs")
 
 
-#' For the Evs class, the query for the Categories resource (typical expenses by Coicop2 categories)
-#' provides additional optional parameters:
-#' income (income level, default "(all)"), hhtype (household type, default "(all)"),
-#' relative (if TRUE (default), return percentages, otherwise Euro).
-#'
 #' @rdname query-methods
-#' @aliases query,Evs,Categories,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,Evs,Categories-method
 setMethod(
   f="query",
-  signature=c(self="Evs", resource=resource("Categories"), dbconn="missing"),
+  signature=c(self="Evs", resource=resource("Categories")),
   definition=function(self, resource, income="(all)", hhtype="(all)", relative=TRUE, ...) {
     
     dat <- subset(query(self, "evs2008.lvl2"), coicop2 != "15" & coicop2 != "00")
@@ -54,15 +53,14 @@ setMethod(
 )
 
 
-#' For the Evs class, the query for the Elasticity resource (Plots expenditures by income group for a given category),
-#' an additional parameters categ (character, category for which to plot income elasticity), xlab and ylab (axis titles)
-#' are supported. Other parameters will be passed to boxplot.
-#'
 #' @rdname query-methods
-#' @aliases query,Evs,Elasticity,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,Evs,Elasticity-method
 setMethod(
   f="query",
-  signature=c(self="Evs", resource=resource("Elasticity"), dbconn="missing"),
+  signature=c(self="Evs", resource=resource("Elasticity")),
   definition=function(self, resource, categ="", xlab="", ylab="", main=NULL, ...) {
     #if(!require(beeswarm)) stop("could not load required package 'beeswarm'")
     dat <- subset(query(self, "evs2008.lvl2"), coicop2 != "15" & coicop2 != "00" & income != "(all)")
@@ -83,10 +81,13 @@ setMethod(
 )
 
 #' @rdname query-methods
-#' @aliases query,Evs,Elasticities,missing-method
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,Evs,Elasticities-method
 setMethod(
   f="query",
-  signature=c(self="Evs", resource=resource("Elasticities"), dbconn="missing"),
+  signature=c(self="Evs", resource=resource("Elasticities")),
   definition=function(self, resource, categ="", xlab="", ylab="", ...) {
     par(mfrow=c(2,1))
     # query(self, "Elasticity", categ="01/02", ...)
