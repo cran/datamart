@@ -5,6 +5,8 @@
 #' @examples
 #' getSlots("Pastebin")
 #'
+#' @seealso \code{\link{pastebin}}
+#'
 #' @name Pastebin-class
 #' @rdname Pastebin-class
 #' @exportClass Pastebin
@@ -14,7 +16,7 @@ setClass(
       api_dev_key = "character",
       api_user_key = "character",
       api_user_name= "character",
-      curl.handle="CURLHandle"
+      curl.handle="ANY" # RCurl:::CURLHandle is not exported
     ),
     contains=c("Location", "Xdata")
 )
@@ -36,8 +38,8 @@ pastebin <- function(
   api_user_password = getOption("pastebin.api_user_password"),
   clss="Pastebin"
 ) {
-  curlHandle = getCurlHandle()
-  api_user_key = postForm("http://pastebin.com/api/api_login.php",
+  curlHandle = RCurl::getCurlHandle()
+  api_user_key = RCurl::postForm("http://pastebin.com/api/api_login.php",
     api_dev_key = api_dev_key,
     api_user_name = api_user_name,
     api_user_password = api_user_password,
@@ -67,25 +69,25 @@ setMethod(
   f="meta",
   signature="Pastebin",
   definition=function(self) {
-    ans <- postForm("http://pastebin.com/api/api_post.php",
+    ans <- RCurl::postForm("http://pastebin.com/api/api_post.php",
       api_option="list",
       api_dev_key = self@api_dev_key,
       api_user_key = self@api_user_key,
       api_results_limit = 999,
       curl = self@curl.handle
     )
-    ans <- htmlParse(ans)
-    ans <- getNodeSet(ans, "//paste")
+    ans <- XML::htmlParse(ans)
+    ans <- XML::getNodeSet(ans, "//paste")
     ans <- sapply(ans, function(n) c(
-      xmlValue(n[["paste_key"]]),
-      xmlValue(n[["paste_date"]]),
-      xmlValue(n[["paste_title"]]),
-      xmlValue(n[["paste_size"]]),
-      xmlValue(n[["paste_expire_date"]]),
-      xmlValue(n[["paste_private"]]),
-      xmlValue(n[["paste_format_long"]]),
-      xmlValue(n[["paste_format_short"]]),
-      xmlValue(n[["paste_hits"]])
+      XML::xmlValue(n[["paste_key"]]),
+      XML::xmlValue(n[["paste_date"]]),
+      XML::xmlValue(n[["paste_title"]]),
+      XML::xmlValue(n[["paste_size"]]),
+      XML::xmlValue(n[["paste_expire_date"]]),
+      XML::xmlValue(n[["paste_private"]]),
+      XML::xmlValue(n[["paste_format_long"]]),
+      XML::xmlValue(n[["paste_format_short"]]),
+      XML::xmlValue(n[["paste_hits"]])
     ))
     ans <- as.data.frame(t(ans), stringsAsFactors=FALSE)
     colnames(ans) <- c("key", "date", "title", "size", "expire_date", "private", "format_long", "format_short", "hits")
@@ -106,7 +108,7 @@ setMethod(
   f="query",
   signature=c(self="Pastebin", resource="character"),
   definition=function(self, resource, verbose=getOption("verbose"), ...) {
-      dl <- getURL(paste("http://pastebin.com/raw.php?i=", resource, sep=""))
+      dl <- RCurl::getURL(paste("http://pastebin.com/raw.php?i=", resource, sep=""))
       return(dl)
       if(resource %in% ls(envir=self@data_env))
         self@data_env[[resource]]

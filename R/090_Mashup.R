@@ -1,29 +1,27 @@
-#' Mashup -- A class for combining Xdata objects
+#' Combine resource into a mashup object
 #'
-#' This class administers a list of Xdata objects and 
-#' delegates \code{query} and
-#' other methods to them. The aim of the class is to 
-#' support the operation of combining different data sources
-#' into one data object.
+#' The \code{Mashup} class administers a list of Xdata objects. This
+#' can be data objects representing different data sources
+#' such as internal data or web data. It can also be 
+#' calculated data resources, so-called resource functions
+#' of class \code{ResFunc}.
 #'
-#' Instances of this class also maintain a database connection for storing/
-#' collecting data. The database connection is shared among the administered Xdata
-#' instances.
+#' In a way, this class can be viewed as a make-like tool
+#' for data. The resource functions can declare dependencies. 
+#' When a resource is requested by the \code{query} method,
+#' the \code{Mashup} class takes care of the build order.
 #'
-#' Usually it is not necessary for inherited classes to
-#' redefine the \code{queries}
-#' method. Rather, it is recommended to add \code{query}
-#' methods with new signatures in the resource slot.
-#' 
 #' @examples
 #' getSlots("Mashup")
 #'
+#' @seealso \code{\link{datamart}}
+#'
 #' @exportClass Mashup
 #' @name Mashup-class
-#' @rdname Mashup-class
+#' @rdname datamart
 setClass(
   Class="Mashup", 
-  representation=representation(data.lst="list"),
+  representation=representation(res.env="environment"),
   contains="Xdata"
 )
 
@@ -33,21 +31,39 @@ setClass(
 #' @param clss  name of the class to create. Default Mashup, must be inherited from this class.
 #'
 #' @export
-#' @rdname Mashup-class
-mashup <- function(..., clss="Mashup") {
-    data.lst <- list(...)
-    
+#' @rdname datamart
+datamart <- function(..., clss="Mashup") {
     # some checks
-    if(length(data.lst)==0) stop("Mashup must consists of at least one Xdata object.")
-    qrs <- lapply(data.lst, queries)
-    qrs.zeros <- which(sapply(qrs, length)==0)
-    if(length(qrs.zeros)>0) warning("Data objects with no resources passed at position(s) ", paste(qrs.zeros, collapse=", "))
-    qrs <-  unlist(Filter(function(x) !is.null(x), qrs)) # sapply does not simplify in case of NULL
-    qrs.dups <- which(duplicated(qrs))
-    if(length(qrs.dups)) stop("Duplicated resources: ", paste(qrs[qrs.dups], collapse=", "))
+    arg.lst <- list(...)
+    if(length(arg.lst)==0) stop("datamart() needs at least one parameter.")
     
-    # build object
-    new(clss, data.lst=data.lst)
+    # populate resource data structure
+    res.env <- new.env()
+    for (o in arg.lst) {
+        if(!inherits(o, "Xdata")) stop("invalid argument to datamart(), needs to derive from Xdata.")
+        res.lst <- queries(o)
+        
+        # no resource?
+        if(length(res.lst)==0) stop("data object with no resource passed to datamart(): '", as.character(o), "'.")
+        
+        for (r in res.lst) {
+            # resource already present?
+            if(exists(r, envir=res.env, inherits=FALSE)) 
+                stop("double resource entry: '", r, "'.")
+            
+            # result
+            assign(r, o, envir=res.env)
+        }
+    }
+    
+    # check if all dependencies are present
+    r <- ls(envir=res.env)
+    r1 <- unlist(lapply(r, function(s) dependencies(res.env[[s]])))
+    missed <- setdiff(r1, r)
+    if(length(missed)>0) stop("depended resources not found: '", paste(missed, collapse="', '"), "'.", sep="")
+
+    # build object 
+    new(clss, res.env=res.env)
 }
 
 #' @rdname query-methods
@@ -56,25 +72,57 @@ mashup <- function(..., clss="Mashup") {
 #' @docType methods
 #' @aliases query query,Mashup,character-method
 setMethod(
-  f="query",
-  signature=c(self="Mashup", resource="character"),
-  definition=function(self, resource, verbose=getOption("verbose"), ...) {
-    ## first, look for queries in this class 
-    if(verbose) cat("Mashup calls inherited method..\n")
-    ret <- try(callNextMethod(), silent=TRUE) 
-    if(!inherits(ret, "try-error")) return(ret)
-    
-    ## then try the mashed data objects 
-    if(verbose) cat("Mashup calls query on its components...\n")
-    for(d in self@data.lst) {
-      ret <- try(query(d, resource=resource, verbose=verbose, ...), silent=TRUE)
-      if(!inherits(ret, "try-error")) return(ret)
+    f="query",
+    signature=c(self="Mashup", resource="character"),
+    definition=function(self, resource, verbose=TRUE, ...) {
+        # build dependency vector
+        check_deps <- resource
+        deps <- c()
+        while(length(check_deps)>0) {
+            r <- check_deps[[1]]
+            check_deps <- tail(check_deps, -1)
+            newdeps <- unlist(dependencies(self@res.env[[r]]))
+            check_deps <- unique(c(newdeps, check_deps))
+            deps <- c(newdeps, deps)
+        }
+        deps <- unique(deps)
+        if(verbose) cat("Mashup: build order for resource '", resource, "': '", paste(deps, collapse="', '"), "'.\n", sep="")
+        
+        # build resources and return the last one
+        # TODO: make it optionally persistent
+        if(length(deps)>0) {
+            cached <- new.env()
+            for (r in deps) {
+                o <- self@res.env[[r]]
+                subdeps <- dependencies(self@res.env[[r]])
+                if(verbose) {
+                    if(length(subdeps)>0) 
+                        cat("Mashup builds '", r, "' and passes pre-built resources '", paste(subdeps, collapse="', '"), "'.\n", sep="")
+                    else
+                        cat("Mashup builds '", r, "' which requires no pre-built resources.\n", sep="")
+                }
+                args <- list()
+                args[["self"]] <- o
+                args[["resource"]] <- r
+                args[["verbose"]] <- verbose
+                for (d in subdeps) args[[d]] <- cached[[d]]
+                ret <- do.call(query, args)
+                assign(r, ret, envir=cached)
+            }
+        }
+
+        # provide the resource requested
+        if(!exists(resource, envir=self@res.env)) stop("Don't know how to devliver '",resource,"'.", sep="")
+        if(verbose) cat("Mashup builds requested resource '", resource, "'.\n", sep="")
+        args <- list(...)
+        args[["self"]] <- self@res.env[[resource]]
+        args[["resource"]] <- resource
+        args[["verbose"]] <- verbose
+        for (d in dependencies(self@res.env[[resource]])) args[[d]] <- cached[[d]]
+        do.call(query, args)
     }
-    stop(sprintf("Invalid resource '%s' specified for mashup data object '%s'", resource, class(self)))
-  }
 )
 
-  
 #' @rdname queries-methods
 #' @name queries
 #' @export
@@ -84,12 +132,9 @@ setMethod(
   f="queries",
   signature="Mashup",
   definition=function(self) { 
-    qrs <- lapply(self@data.lst, queries)
-    qrs <-  unlist(Filter(function(x) !is.null(x), qrs)) # sapply does not simplify in case of NULL
-
+    qrs <- ls(envir=self@res.env)
     ret <- c(callNextMethod(), qrs)
     names(ret) <- NULL
-    ret <- ret[ret!="character"]
     return(ret)
   }
 )

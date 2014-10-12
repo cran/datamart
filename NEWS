@@ -1,3 +1,54 @@
+datamart Version 0.5.1
+------------------------------------------------------------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+*  The Mashup class has been rewritten. The changes are not backward compatible. The new
+   implementation paves the way to a make-like, declarative data build process.
+   
+*  The Blogger class has been rewritten in order to use the OAuth2 interface for posting.
+
+*  The InternalData class has been rewritten. The changes are not backward compatible. The
+   resource name(s) for dataset is/are now predefined through the dataset name(s). Hence it is
+   not possible to set the resource name elsewhere. This was necessary as internal datasets
+   may comprise several data entities.
+   
+*  The Xsparql2 class with its constructor xsparql2 has been renamed to Xsparql/xsparql. At
+   this experimental stage, the classes and interfaces are still changing, breaking existing
+   code. Hence naming new versions of an idea differently is not necessary in my opinion.
+   
+*  The UrlData3 class has been renamed to UrlData.
+
+NEW FEATURES
+
+*  a class CsvData for administrating tabular data: an update mechanism, keeping metadata on 
+   the dataset and on dataset columns.
+
+MINOR FEATURES
+
+*  New unit sets for area and volume are introduced. Also, the self-tests for the uconv function
+   have been revised.
+
+*  New class GoogleOAuth2 which enables connection with Google services such as Blogger. It 
+   manages a file with the access token, so that acquiring an access token through authentication 
+   is necessary only once.
+   
+*  New XSPARQL examples on power plants: openei() and enipedia()
+
+*  The gapminder() datamart, which was removed for the last few versions, has returned.
+
+*  improved documentation: partly due to new version of roxygen, partly due to usage of href
+   instead of url, added @seealso where appropriate
+
+DEPRECATED AND DEFUNCT
+
+*  removed the unit set for temperature. Since the unit conversion between degree F and degree C 
+   is affine but not homogen, it is not easy to fit it in the existing code. May return in later 
+   version, but I need to rethink the concept first.
+   
+*  removed siunit and mySPARQL documentation. These are internal functions.
+
+
 datamart Version 0.4.2
 ------------------------------------------------------------------------------
 

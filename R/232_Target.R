@@ -1,5 +1,6 @@
 #' Buildable target
-#' 
+#'
+#' This is an abstract class for defining buildable targets. 
 #'
 #' @name Target-class
 #' @rdname Target-class
@@ -8,7 +9,6 @@ setClass(Class="Target", representation=representation(name="character"))
 
 #' @rdname show-methods
 #' @name show
-#' @export
 #' @docType methods
 #' @aliases show show,Target-method
 #' @export

@@ -10,6 +10,8 @@
 #' @examples
 #' getSlots("DirectoryLocation")
 #'
+#' @seealso \code{\link{dirloc}}
+#'
 #' @name DirectoryLocation-class
 #' @rdname DirectoryLocation-class
 #' @exportClass DirectoryLocation
@@ -68,3 +70,19 @@ setMethod(
   }
 )
 
+#' @param extract.fct    (DirectoryLocation) which function to use to read file (default \code{readLines})
+#' @rdname query-methods
+#' @name query
+#' @export
+#' @docType methods
+#' @aliases query query,DirectoryLocation,character-method
+setMethod(
+    f="query",
+    signature=c(self="DirectoryLocation", resource="character"),
+    definition=function(self, resource, verbose=getOption("verbose"), extract.fct=readLines, ...) {
+        p <- file.path(self@path, resource)
+        if(!isTRUE(file.exists(p))) stop("invalid file name: ", p)
+        if(verbose) cat("loading file..\n")
+        extract.fct(p)
+    }
+)

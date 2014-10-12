@@ -5,6 +5,8 @@
 #' @examples
 #' getSlots("MdReport")
 #'
+#' @seealso \code{\link{mdfigure}}
+#'
 #' @name MdFigure-class
 #' @rdname MdFigure-class
 setClass(
@@ -66,7 +68,7 @@ setMethod(
     ext <- "png"
     tfile <- tempfile()
     on.exit(unlink(tfile))
-    base64::encode(file.path(tempdir(), ifile), tfile)
+    base64::encode(file.path(tempdir(), basename(ifile)), tfile)
     sprintf("data:image/%s;base64,\n%s", ext, paste(readLines(tfile), collapse = "\n"))
   }
 )

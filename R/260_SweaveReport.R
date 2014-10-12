@@ -1,10 +1,12 @@
 #' Wrapper for Sweave and pdf
 #' 
-#' The main S4 class in this framework is \code{SweaveReport}. You can
-#' create a report with \code{swvreport}, which takes a sweave file name,
+#' This class provides the basis to build dynamic reports using LaTeX and
+#' resource from a datamart. You can
+#' create a report with \code{swvreport}, which takes a sweave file name. 
 #' The generic method \code{put} 
 #' can then be used to actually produce the report in pdf format.
 #' 
+#' @seealso \code{\link{swvreport}}
 #' @examples
 #' getSlots("SweaveReport")
 #'
@@ -30,7 +32,7 @@ setClass(
 #' @param name        name of the Report, default ''
 #' @param verbose     diagnostic messages T/F
 #' @param clss        class of the constructed object, default 'SweaveReport'
-#' @param ...         number of targets
+#' @param ...         additional arguments, currently unused.
 #'
 #' @return generic
 #' @export

@@ -7,6 +7,8 @@
 #' @examples
 #' getSlots("FileTarget")
 #'
+#' @seealso \code{\link{filetarget}}
+#'
 #' @name FileTarget-class
 #' @rdname FileTarget-class
 #' @exportClass FileTarget
@@ -33,6 +35,7 @@ filetarget <- function(name, filename, clss="FileTarget")
   new(clss, name=name, filename=filename)
 
 
+#' @param overwrite    parameter for FileTarget/MdReport -- overwrite existing files? Default TRUE.
 #' @rdname put-methods
 #' @name put
 #' @export
@@ -60,3 +63,14 @@ setMethod(
   definition=function(object) cat(sprintf("<file target %s (%s)>\n", object@name, object@filename))
 )
 
+
+#' @rdname as.character-methods
+#' @name as.character
+#' @export
+#' @docType methods
+#' @aliases as.character,FileTarget-method
+setMethod(
+  f="as.character",
+  signature="FileTarget",
+  definition=function(x) x@filename
+)

@@ -28,11 +28,7 @@ setMethod(
   f="query",
   signature=c(self="Xdata", resource="character"),
   definition=function(self, resource, ...) {
-      r <- try(new(resource), silent=TRUE)
-      if(!inherits(r, "try-error"))
-        query(self, r, ...)
-      else
-        stop(sprintf("Invalid resource '%s' specified for data object '%s'", resource, class(self)))
+     stop(sprintf("Invalid resource '%s' specified for data object '%s'", resource, class(self)))
   }
 )
 
@@ -59,6 +55,7 @@ setMethod(
 #' The \code{show} method for the Xdata class has been adapted to display the class name.
 #' Some inherited classes such DirectoryLocation or Blogger override this default definition.
 #'
+#' @param object    Xdata object
 #' @rdname show-methods
 #' @name show
 #' @export
@@ -78,5 +75,16 @@ setMethod(
 setMethod(
   f="meta",
   signature=c("Xdata"),
-  definition=function(self) data.frame() 
+  definition=function(self, ...) data.frame() 
+)
+
+#' @rdname dependencies-methods
+#' @name dependencies
+#' @export
+#' @docType methods
+#' @aliases dependencies dependencies,Xdata-method
+setMethod(
+  f="dependencies",
+  signature=c("Xdata"),
+  definition=function(self) return(list())
 )

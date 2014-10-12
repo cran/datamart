@@ -2,13 +2,16 @@
 #'
 #' website traffic as tracked by iwv online.
 #' Use yyyymm for query() as resource.
+#' This is an example for the \code{urldata} function.
 #'
-#' @return UrlData3 object
+#' @seealso \code{\link{urldata}}
+#'
+#' @return UrlData object
 #' @references 
-#' \url{http://en.wikipedia.org/wiki/Informationsgemeinschaft_zur_Feststellung_der_Verbreitung_von_Werbetraegern}
+#' \href{http://en.wikipedia.org/wiki/Informationsgemeinschaft_zur_Feststellung_der_Verbreitung_von_Werbetraegern}{Wikipedia}
 #' @docType data
 #' @export
-iwv_online <- function() urldata3(
+iwv_online <- function() urldata(
   resource="Iwv",
   template="http://ausweisung.ivw-online.de/i.php?s=$(detail_level)&mz=$(year)$(month)&csv=1", # s defines the detail level 1:3
   detail_level=1,

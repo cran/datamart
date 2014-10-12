@@ -1,16 +1,19 @@
-#' Improved list of objects
+#' Information on objects in R environment
 #'
-#' @param env              the environment to inspect, default is .GlobalEnv
+#' This function creates a list of objects that are currently in a given R environment (default the global workspace). 
+#' Hence it is an extended version of \code{ls}.
+#'
+#' @param envir            the environment to inspect, default is .GlobalEnv
 #' @param sortBy           the result will be decreasingly sorted by this column. Possible values "Type", "Size" (default), "Rows", "Columns"
 #'
 #' @return data.frame with object information
 #' @references 
-#' \url{http://stackoverflow.com/questions/1358003/tricks-to-manage-the-available-memory-in-an-r-session}
+#' \href{http://stackoverflow.com/questions/1358003/tricks-to-manage-the-available-memory-in-an-r-session}{Stackoverflow}
 #' @export
 #' @author Petr Pikal, David Hinds and Dirk Eddelbuettel
-mem.info <- function(env=.GlobalEnv, sortBy="Size") {
-    napply <- function(names, fn) sapply(names, function(x) fn(get(x, envir=env)))
-    names <- ls(envir=env)
+mem.info <- function(envir=.GlobalEnv, sortBy="Size") {
+    napply <- function(names, fn) sapply(names, function(x) fn(get(x, envir=envir)))
+    names <- ls(envir=envir)
     obj.class <- napply(names, function(x) as.character(class(x))[1])
     obj.mode <- napply(names, mode)
     obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)

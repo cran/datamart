@@ -8,11 +8,12 @@
 #' if necessary.
 #'
 #' @param self    an Location object
+#' @param ...     additional parameters
 #'
 #' @export
 #' @rdname meta-methods
 #' @docType methods
 setGeneric(
   name="meta",
-  def=function(self){standardGeneric("meta")}
+  def=function(self, ...){standardGeneric("meta")}
 )
